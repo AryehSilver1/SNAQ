@@ -17,6 +17,7 @@ library(foreach)
 library(doParallel)
 ```
 
+
 Initializing variables
 ```{r, include = FALSE}
 
