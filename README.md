@@ -52,7 +52,7 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
 
 
 
-# README for Plot Maker Analysis
+# README for Plot Maker
 
 ## General Setup and Libraries
 This script requires a suite of R packages for data manipulation and visualization:
