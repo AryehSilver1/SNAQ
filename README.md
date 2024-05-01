@@ -1,7 +1,6 @@
 
 ## README for Data Analysis
 
-
 ### Description
 The R Markdown document titled "Template Data Analysis" automates the analysis of immunohistochemically stained tissue samples at the single-cell level using RStudio. The primary focus is on neighborhood analysis of cellular interactions within fluorescently-stained samples. The methodology integrates image processing, cellular classification, and geospatial analysis to identify and visualize spatial patterns of different cell types and their proliferation markers.
 
