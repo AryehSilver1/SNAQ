@@ -319,7 +319,37 @@ ringBarD = ggplot(Dsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
   geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2, color = "white") +
   theme_cleveland()
 ringBarD
+
+#for only C+ B cells
+C.B = newCombo[newCombo$identityCat == "B" & newCombo$identityC == "C+", ]
+longC.B = gather(C.B, key = "ring", value = "prop", c(Bprop1, Bprop2, Bprop3, Aprop1, Aprop2, Aprop3, Dprop1, Dprop2, Dprop3))
+C.Bsummary = longC.B %>%
+  drop_na(prop) %>%
+  group_by(ring) %>%
+  summarise(Mean = mean(prop),
+            SD = sd(prop)) %>%
+  mutate(ringNumber = case_when(grepl('prop1', ring) ~ "ring1",
+                                grepl('prop2', ring) ~ "ring2",
+                                grepl('prop3', ring) ~ "ring3")) %>%
+  group_by(ringNumber) %>%
+  mutate(typeCat = case_when(grepl('A', ring) ~ "A",
+                             grepl('B', ring) ~ "B",
+                             grepl('D', ring) ~ "D"))
+
+
+ringBarC.B = ggplot(C.Bsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
+  geom_col() +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("deepskyblue2", "brown1", "azure4")) +
+  coord_polar("y") +
+  labs(title = paste0(markerC, "+ ", markerB, " cells only: Proprtion of neighbor cells for each ring"),
+       x = "",
+       y = "") +
+  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2, color = "white") +
+  theme_cleveland()
+ringBarC.B
+
 ```
+
 
 ```{r}
 #bargraph showing the number for each cell type that are LS+ (remember that bar just finds counts)
