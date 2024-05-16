@@ -17,7 +17,6 @@ library(foreach)
 library(doParallel)
 ```
 
-
 Initializing variables
 ```{r, include = FALSE}
 
@@ -26,21 +25,77 @@ dist1 = 15 #um - distance away from cell's center for the first ring
 dist2 = 35 #um - distance away from cell's center for the second ring
 dist3 = 55 #um - distance away from cell's center for the third ring
 maxDist = dist3
-maxXum = 447.63 #um - image width
-maxYum = 335.40 #um - image height
-numImages = 10 #total number of images
+maxXum = 750 #um - image width
+maxYum = 750 #um - image height
+numImages = 8 #total number of images
 
-markerA = "Iba1"
-markerB = "SOX2"
-markerC = "Ki67"
+markerA = "PanCK"
+markerB = "CD68"
+markerC = "PD-L1"
 
-inputFolder = "C:/Users/arisi/Documents/Research/Deleyrolle/Methods Paper/Template Scripts/Input"
-outputFolder = "C:/Users/arisi/Documents/Research/Deleyrolle/Methods Paper/Template Scripts/Output"
+inputFolder = "C:/Users/arisi/Dropbox (UFL)/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/PDAC Images/Input"
+
+outputFolder = "C:/Users/arisi/Dropbox (UFL)/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/PDAC Images/Output"
 
 #inputFolder = "" #put the Path to the input folder (make sure to use backwards slashes)
 #outputFolder = "" #put the Path to the output folder (make sure to use backwards slashes)
 
 ```
+
+FOR PDAC IMAGES ONLY! Only run if your ROIs come from a stitch and are combined in one CSV file
+```{r}
+
+fullDataFileName = "PDAC_measurements" # for PDAC only
+
+#if images are from ROIs from a stitch, fill out information below
+ROI1centroidX = 10292.05
+ROI1centroidY = 10367.125
+ROI2centroidX = 11455.55
+ROI2centroidY = 11166.95
+ROI3centroidX = 5007.225
+ROI3centroidY = 12657.4
+ROI4centroidX = 5998.8
+ROI4centroidY = 13404.9
+ROI5centroidX = 11549.475
+ROI5centroidY = 14804.025
+ROI6centroidX = 8251.375
+ROI6centroidY = 14958.075
+ROI7centroidX = 5706.95
+ROI7centroidY = 16916.2
+ROI8centroidX = 9660.9
+ROI8centroidY = 8966.7
+
+
+# downloads the CSV file with data for every cell in the image
+fileName = paste0(inputFolder, "/", fullDataFileName, ".csv")
+allData = read_csv(fileName)
+
+# separates the large CSV file into separate dataframes for each ROI
+for (i in 1:numImages) {
+  dataFrameName = paste0("MeasurementsData", as.character(i))
+  ROI = paste0("ROI_", as.character(i))
+  centroidX = paste0("ROI", as.character(i), "centroidX")
+  centroidY = paste0("ROI", as.character(i), "centroidY")
+  newDataFrame = allData %>%
+    filter(Parent == ROI) %>%
+    select(-Parent)
+  colnames(newDataFrame) = c("Classification", "xDim", "yDim")
+  newDataFrame = newDataFrame %>%
+    mutate(
+      xDim = xDim - (get(centroidX) - (maxXum / 2)),
+      yDim = yDim - (get(centroidY) - (maxYum / 2))
+    )
+  assign(dataFrameName, newDataFrame)
+  
+  # exports each dataframe back into input folder
+  dir = paste0(inputFolder, "/MeasurementsData", as.character(i), ".csv")
+  write.csv(get(dataFrameName) , dir, row.names = FALSE)
+  
+  
+}
+
+```
+
 
 Importing data table
 ```{r, include = FALSE}
