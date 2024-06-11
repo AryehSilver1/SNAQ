@@ -1,0 +1,853 @@
+---
+title: "Plot Maker"
+output: html_document
+date: "2023-12-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Initialize libraries
+```{r, include = FALSE}
+library(readxl)
+library(tidyverse)
+library(ggsignif)
+library(ggdark)
+library(data.table)
+library(ggthemes)
+```
+
+Variables to Initialize
+```{r}
+
+#variables to input by the user
+
+dist1 = 15 #um - distance away from cell's center for the first ring
+dist2 = 35 #um - distance away from cell's center for the second ring
+dist3 = 55 #um - distance away from cell's center for the third ring
+maxDist = dist3
+maxXum = 750 #um - image width
+maxYum = 750 #um - image height
+numberOfImages = 8 #total number of images
+
+markerA = "PanCK"
+markerB = "CD68"
+markerC = "PD-L1"
+markerD = "Neither"
+
+workingDir = "" #Path to the folder with output CSV files (make sure to use backwards slashes)
+graphOutputPath = "" #Path to the folder where you want to save the graphs
+
+```
+
+
+Run to analyze all images (if you run this chunk, skip the next one)
+```{r, include = FALSE}
+setwd(workingDir)
+
+newCombo = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("newCombo", as.character(n), ".csv")
+  tempCombo = read_csv(fileName)
+  newCombo = rbind(newCombo, tempCombo)
+}
+```
+
+Run to just analyze ONE image at a time
+```{r, include = FALSE}
+setwd(workingDir)
+
+n = 3 #put the image number here
+
+fileName = paste0("newCombo", n, ".csv")
+newCombo = read_csv(fileName)
+```
+
+Creating data tables
+
+
+```{r}
+#NOTE: map_signif_level = FALSE gives p-val and TRUE gives stars
+
+totalObservations = table(newCombo$identityCat)
+totalObservations
+
+medians = aggregate(Bprop ~ identityCat, data = newCombo, FUN = median)
+
+boxwhiskerB = ggplot(newCombo, aes(x = identityCat, y = Bprop, fill = identityCat)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("deepskyblue2", "deepskyblue2", "deepskyblue2")) +
+  labs(title = paste0(markerB, " Neighbor Comparison"),
+       x = "Classification",
+       y = paste0("Proportion of neighbors that are ", markerB)) +
+  coord_cartesian(ylim = c(0, 1.25)) +
+  geom_signif(comparisons = list(c("B", "A"), c("A", "D"), c("B", "D")),
+              map_signif_level = TRUE, 
+              textsize = 4,
+              y_position = c(1, 1.08, 1.16)) +
+  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("B", "A", "D")) +
+  geom_text(data = medians, aes(label = round(Bprop, 2)), vjust = -0.2) +
+  theme(legend.position = "none")
+boxwhiskerB
+
+graphTitle = paste0(graphOutputPath, "/", markerB, " Neighbor Comparison", ".png")
+ggsave(graphTitle, boxwhiskerB, width = 6, height = 4, units = "in", dpi = 600)
+
+
+
+medians = aggregate(Aprop ~ identityCat, data = newCombo, FUN = median)
+
+boxwhiskerA = ggplot(newCombo, aes(x = identityCat, y = Aprop, fill = identityCat)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("brown1", "brown1", "brown1")) +
+  labs(title = paste0(markerA, " Neighbor Comparison"),
+       x = "Classification",
+       y = paste0("Proportion of neighbors that are ", markerA)) +
+  coord_cartesian(ylim = c(0, 1.25)) +
+  geom_signif(comparisons = list(c("B", "A"), c("A", "D"), c("B", "D")),
+              map_signif_level = TRUE, 
+              textsize = 4,
+              y_position = c(1, 1.08, 1.16)) +
+  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("B", "A", "D")) +
+  geom_text(data = medians, aes(label = round(Aprop, 2)), vjust = -0.2) +
+  theme(legend.position = "none")
+boxwhiskerA
+
+graphTitle = paste0(graphOutputPath, "/", markerA, " Neighbor Comparison", ".png")
+ggsave(graphTitle, boxwhiskerA, width = 6, height = 4, units = "in", dpi = 600)
+
+
+
+medians = aggregate(Dprop ~ identityCat, data = newCombo, FUN = median)
+
+boxwhiskerD = ggplot(newCombo, aes(x = identityCat, y = Dprop, fill = identityCat)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("azure4", "azure4", "azure4")) +
+  labs(title = paste0(markerD, " Neighbor Comparison"),
+       x = "Classification",
+       y = paste0("Proportion of neighbors that are ", markerD)) +
+  coord_cartesian(ylim = c(0, 1.25)) +
+  geom_signif(comparisons = list(c("B", "A"), c("A", "D"), c("B", "D")),
+              map_signif_level = TRUE, 
+              textsize = 4,
+              y_position = c(1, 1.08, 1.16)) +
+  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("B", "A", "D")) +
+  geom_text(data = medians, aes(label = round(Dprop, 2)), vjust = -0.2) +
+  theme(legend.position = "none")
+boxwhiskerD
+
+graphTitle = paste0(graphOutputPath, "/", markerD, " Neighbor Comparison", ".png")
+ggsave(graphTitle, boxwhiskerD, width = 6, height = 4, units = "in", dpi = 600)
+
+
+
+medians = aggregate(Cprop ~ identityCat, data = newCombo, FUN = median)
+
+boxwhiskerC = ggplot(newCombo, aes(x = identityCat, y = Cprop, fill = identityCat)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("green3", "green3", "green3")) +
+  labs(title = paste0(markerC, "+ Neighbor Comparison"),
+       x = "Classification",
+       y = paste0("Proportion of neighbors that are ", markerC, "+")) +
+  coord_cartesian(ylim = c(0, 1.25)) +
+  geom_signif(comparisons = list(c("B", "A"), c("A", "D"), c("B", "D")),
+              map_signif_level = TRUE, 
+              textsize = 4,
+              y_position = c(1, 1.08, 1.16)) +
+  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("B", "A", "D")) +
+  geom_text(data = medians, aes(label = round(Cprop, 2)), vjust = -0.2) +
+  theme(legend.position = "none")
+boxwhiskerC
+
+graphTitle = paste0(graphOutputPath, "/", markerC, " Neighbor Comparison", ".png")
+ggsave(graphTitle, boxwhiskerC, width = 6, height = 4, units = "in", dpi = 600)
+
+
+
+medians = aggregate(B.Cprop ~ identityCat, data = newCombo, FUN = median)
+
+boxwhiskerB.C = ggplot(newCombo, aes(x = identityCat, y = B.Cprop, fill = identityCat)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("aquamarine", "aquamarine", "aquamarine")) +
+  labs(title = paste0(markerC, "+ ", markerB, " Neighbor Comparison"),
+       x = "Classification",
+       y = paste0("Proportion of neighbors that are ", markerC, "+ ", markerB)) +
+  coord_cartesian(ylim = c(0, 1.25)) +
+  geom_signif(comparisons = list(c("B", "A"), c("A", "D"), c("B", "D")),
+              map_signif_level = TRUE,
+              textsize = 4,
+              y_position = c(1, 1.08, 1.16)) +
+  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("B", "A", "D")) +
+  geom_text(data = medians, aes(label = round(B.Cprop, 2)), vjust = -0.2, color = "black") +
+  theme(legend.position = "none")
+boxwhiskerB.C
+
+graphTitle = paste0(graphOutputPath, "/", markerC, "+ ", markerB, " Neighbor Comparison", ".png")
+ggsave(graphTitle, boxwhiskerB.C, width = 6, height = 4, units = "in", dpi = 600)
+
+```
+
+Plotting the cells on a grid (only use with one image!)
+```{r}
+
+num = 2  #this is the image number for these graphs
+
+newComboSmall = newCombo[newCombo$ImageNumber == num, ]
+
+
+grid = ggplot(newComboSmall, aes(x = xDim, y = yDim, color = identityCat, shape = identityC)) + 
+  geom_point(size = 1.8) +
+  scale_color_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("red","blue", "azure3")) +
+  scale_shape_discrete(labels = c("C-" = paste0(markerC, "-"), "C+" = paste0(markerC, "+"))) +
+  guides(shape = guide_legend(override.aes = list(color = "black"))) +
+  coord_cartesian(xlim = c(0, maxXum), ylim = c(0, maxYum)) +
+  labs(title = "Plot of Cells and Box Showing Excluded Cells",
+       x = "x coordinate",
+       y = "y coordinate") +
+  annotate("rect", xmin = maxDist, xmax = (maxXum - maxDist), ymin = maxDist, ymax = (maxYum - maxDist), alpha = 1.0, fill = NA, linewidth = 0.5, color = "black") +
+  theme_classic()
+grid
+
+gridC = ggplot(newComboSmall, aes(x = xDim, y = yDim, color = identityC)) + 
+  geom_point(size = 1.8) +
+  scale_color_manual(labels = c("C-" = paste0(markerC, "-"), "C+" = paste0(markerC, "+")), values = c("azure3", "green3")) +
+  coord_cartesian(xlim = c(0, maxXum), ylim = c(0, maxYum)) +
+  theme_classic() +
+  labs(title = paste0("Plot Showing ", markerC,  "+ and ", markerC, "- Cells"),
+       x = "x coordinate",
+       y = "y coordinate") +
+  annotate("rect", xmin = maxDist, xmax = (maxXum - maxDist), ymin = maxDist, ymax = (maxYum - maxDist), alpha = 1.0, fill = NA, linewidth = 0.5, color = "black")
+gridC
+
+
+#heatmaps
+heatmapB = ggplot(newComboSmall, aes(x = xDim, y = yDim, color = Bprop)) + 
+  geom_point(size = 2.2) +
+  coord_cartesian(xlim = c(0, maxXum), ylim = c(0, maxYum)) +
+  scale_color_gradientn(colors = rainbow(5), trans = "reverse") +
+  dark_theme_classic() +
+  labs(title = paste0("Heatmap Showing Number of ", markerB, " Neighbors"),
+       x = "x coordinate",
+       y = "y coordinate")
+heatmapB
+
+heatmapC = ggplot(newComboSmall, aes(x = xDim, y = yDim, color = Cprop)) + 
+  geom_point(size = 2.2) +
+  coord_cartesian(xlim = c(0, maxXum), ylim = c(0, maxYum)) +
+  scale_color_gradientn(colors = rainbow(5), trans = "reverse") +
+  dark_theme_classic() +
+  labs(title = paste0("Heatmap Showing Number of ", markerC, "+ Neighbors"),
+       x = "x coordinate",
+       y = "y coordinate")
+heatmapC
+```
+
+
+
+```{r}
+#for only B cells
+B = newCombo[newCombo$identityCat == "B", ]
+longB = gather(B, key = "ring", value = "prop", c(Bprop1, Bprop2, Bprop3, Aprop1, Aprop2, Aprop3, Dprop1, Dprop2, Dprop3))
+Bsummary = longB %>%
+  drop_na(prop) %>%
+  group_by(ring) %>%
+  summarise(Mean = mean(prop),
+            SD = sd(prop)) %>%
+  mutate(ringNumber = case_when(grepl('prop1', ring) ~ "ring1",
+                                grepl('prop2', ring) ~ "ring2",
+                                grepl('prop3', ring) ~ "ring3")) %>%
+  group_by(ringNumber) %>%
+  mutate(typeCat = case_when(grepl('A', ring) ~ "A",
+                             grepl('B', ring) ~ "B",
+                             grepl('D', ring) ~ "D"))
+
+
+ringBarB = ggplot(Bsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
+  geom_col() +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("brown1", "deepskyblue2", "azure4")) +
+  coord_polar("y") +
+  labs(title = paste0("Proportion of each cell type within each ring for ", markerB, " cells"),
+       x = "",
+       y = "",
+       fill = "Classification") +
+  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2, color = "white") +
+  theme_void() +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+ringBarB
+
+graphTitle = paste0(graphOutputPath, "/", markerB, " cells only Proprtion of neighbor cells in each ring", ".png")
+ggsave(graphTitle, ringBarB, width = 6, height = 4, units = "in", dpi = 600)
+
+
+#for only A cells
+A = newCombo[newCombo$identityCat == "A", ]
+longA = gather(A, key = "ring", value = "prop", c(Bprop1, Bprop2, Bprop3, Aprop1, Aprop2, Aprop3, Dprop1, Dprop2, Dprop3))
+Asummary = longA %>%
+  drop_na(prop) %>%
+  group_by(ring) %>%
+  summarise(Mean = mean(prop),
+            SD = sd(prop)) %>%
+  mutate(ringNumber = case_when(grepl('prop1', ring) ~ "ring1",
+                                grepl('prop2', ring) ~ "ring2",
+                                grepl('prop3', ring) ~ "ring3")) %>%
+  group_by(ringNumber) %>%
+  mutate(typeCat = case_when(grepl('A', ring) ~ "A",
+                             grepl('B', ring) ~ "B",
+                             grepl('D', ring) ~ "D"))
+
+
+ringBarA = ggplot(Asummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
+  geom_col() +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("brown1", "deepskyblue2", "azure4")) +
+  coord_polar("y") +
+  labs(title = paste0("Proportion of each cell type within each ring for ", markerA, " cells"),
+       x = "",
+       y = "",
+       fill = "Classification") +
+  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2, color = "white") +
+  theme_void() +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+ringBarA
+
+graphTitle = paste0(graphOutputPath, "/", markerA, " cells only Proprtion of neighbor cells in each ring", ".png")
+ggsave(graphTitle, ringBarA, width = 6, height = 4, units = "in", dpi = 600)
+
+
+#for only D cells
+D = newCombo[newCombo$identityCat == "D", ]
+longD = gather(D, key = "ring", value = "prop", c(Bprop1, Bprop2, Bprop3, Aprop1, Aprop2, Aprop3, Dprop1, Dprop2, Dprop3))
+Dsummary = longD %>%
+  drop_na(prop) %>%
+  group_by(ring) %>%
+  summarise(Mean = mean(prop),
+            SD = sd(prop)) %>%
+  mutate(ringNumber = case_when(grepl('prop1', ring) ~ "ring1",
+                                grepl('prop2', ring) ~ "ring2",
+                                grepl('prop3', ring) ~ "ring3")) %>%
+  group_by(ringNumber) %>%
+  mutate(typeCat = case_when(grepl('A', ring) ~ "A",
+                             grepl('B', ring) ~ "B",
+                             grepl('D', ring) ~ "D"))
+
+
+ringBarD = ggplot(Dsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
+  geom_col() +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("brown1", "deepskyblue2", "azure4")) +
+  coord_polar("y") +
+  labs(title = paste0("Proportion of each cell type within each ring for ", markerD, " cells"),
+       x = "",
+       y = "",
+       fill = "Classification") +
+  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2, color = "white") +
+  theme_void() +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+ringBarD
+
+graphTitle = paste0(graphOutputPath, "/", markerD, " cells only Proprtion of neighbor cells in each ring", ".png")
+ggsave(graphTitle, ringBarD, width = 6, height = 4, units = "in", dpi = 600)
+
+
+
+#for only C+ B cells
+C.B = newCombo[newCombo$identityCat == "B" & newCombo$identityC == "C+", ]
+longC.B = gather(C.B, key = "ring", value = "prop", c(Bprop1, Bprop2, Bprop3, Aprop1, Aprop2, Aprop3, Dprop1, Dprop2, Dprop3))
+C.Bsummary = longC.B %>%
+  drop_na(prop) %>%
+  group_by(ring) %>%
+  summarise(Mean = mean(prop),
+            SD = sd(prop)) %>%
+  mutate(ringNumber = case_when(grepl('prop1', ring) ~ "ring1",
+                                grepl('prop2', ring) ~ "ring2",
+                                grepl('prop3', ring) ~ "ring3")) %>%
+  group_by(ringNumber) %>%
+  mutate(typeCat = case_when(grepl('A', ring) ~ "A",
+                             grepl('B', ring) ~ "B",
+                             grepl('D', ring) ~ "D"))
+
+
+ringBarC.B = ggplot(C.Bsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
+  geom_col() +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("brown1", "deepskyblue2", "azure4")) +
+  coord_polar("y") +
+  labs(title = paste0( "Proportion of each cell type within each ring for ", markerC, "+ ", markerB, " cells"),
+       x = "",
+       y = "",
+       fill = "Classification") +
+  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2, color = "white") +
+  theme_void() +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+ringBarC.B
+
+graphTitle = paste0(graphOutputPath, "/", markerC, "+ ", markerB, " cells only Proprtion of neighbor cells in each ring", ".png")
+ggsave(graphTitle, ringBarC.B, width = 6, height = 4, units = "in", dpi = 600)
+
+```
+
+
+```{r}
+#bargraph showing the number for each cell type that are C+ (remember that bar just finds counts)
+
+B = newCombo[newCombo$identityCat == "B", ]
+A = newCombo[newCombo$identityCat == "A", ]
+D = newCombo[newCombo$identityCat == "D", ]
+
+Btotal = count(B) %>% .$n
+Atotal = count(A) %>% .$n
+Dtotal = count(D) %>% .$n
+
+B.C = sum(B$identityC == "C+")
+A.C = sum(A$identityC == "C+")
+D.C = sum(D$identityC == "C+")
+
+B.Cprop = B.C / Btotal
+BnoCprop = 1 - B.Cprop
+A.Cprop = A.C / Atotal
+AnoCprop = 1 - A.Cprop
+D.Cprop = D.C / Dtotal
+DnoCprop = 1 - D.Cprop
+
+Cbargraph = data.table(propName = c("BnoCprop","B.Cprop", "AnoCprop", "A.Cprop",  "DnoCprop","D.Cprop"), 
+                       prop = c(BnoCprop, B.Cprop, AnoCprop, A.Cprop, DnoCprop, D.Cprop))
+
+
+Cbargraph = Cbargraph %>%
+  mutate(identity = case_when(grepl('B', propName) ~ "B",
+                              grepl('A', propName) ~ "A",
+                              grepl('D', propName) ~ "D")) %>%
+  group_by(identity) %>%
+  mutate(Cplusorminus = ifelse(propName == "A.Cprop" | propName == "B.Cprop" | propName == "D.Cprop", "C+", "C-"))
+
+
+barC = ggplot(Cbargraph, aes(x = identity, y = prop, fill = Cplusorminus)) +
+  geom_bar(stat = "identity", position = position_fill(reverse = FALSE)) +
+  scale_fill_manual(labels = c("C+" = paste0(markerC, "+"), "C-" = paste0(markerC, "-")), values = c("C+" = "green3", "C-" = "azure4")) +
+  labs(title = paste0("Proportion of ", markerC, "+ and ", markerC, "- for each cell type"),
+       x = "Classification",
+       y = "Proportion",
+       fill = "Identity") +
+  geom_text(aes(label = paste(round(prop, 3))), position = position_fill(reverse = FALSE), vjust = 2, color = "black") +
+  scale_x_discrete(limits = c("B", "A", "D"), labels = c("B" = markerB, "A" = markerA, "D" = markerD))
+barC
+
+graphTitle = paste0(graphOutputPath, "/", "Proportion of ", markerC, "+ and ", markerC, "- for each cell type", ".png")
+ggsave(graphTitle, barC, width = 6, height = 4, units = "in", dpi = 600)
+
+
+barCwithSIG = ggplot(newCombo, aes(x = identityCat, fill = identityC)) +
+  geom_bar(position = "dodge") +
+  labs(title = paste0("Number of ", markerC, "+ and ", markerC, "- cells for each cell type"),
+       x = "Classification",
+       y = "Number of Cells",
+       fill = "Identity") +
+  scale_fill_manual(labels = c("C+" = paste0(markerC, "+"), "C-" = paste0(markerC, "-")), values = c("azure4", "green3")) +
+  scale_x_discrete(limits = c("B", "A", "D"), labels = c("B" = markerB, "A" = markerA, "D" = markerD))
+barCwithSIG
+
+graphTitle = paste0(graphOutputPath, "/", "Number of ", markerC, "+ and ", markerC, "- cells for each cell type", ".png")
+ggsave(graphTitle, barCwithSIG, width = 6, height = 4, units = "in", dpi = 600)
+
+```
+
+
+
+
+
+
+******************************************************************************
+Analyzing the nearing neighbor lists
+```{r, include = FALSE}
+setwd(workingDir)
+
+closestA = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("distA", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  closestA = rbind(closestA, temp)
+}
+
+colnames(closestA) = c("dist")
+closestA$category = "distToA"
+
+
+
+closestD = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("distD", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  closestD = rbind(closestD, temp)
+}
+
+colnames(closestD) = c("dist")
+closestD$category = "distToD"
+
+
+closestCombo = rbind(closestA, closestD)
+```
+
+Finds the average distance of the closest A or D from each B
+```{r}
+
+medians = aggregate(dist ~ category, data = closestCombo, FUN = median)
+
+plotClosest = ggplot(data = closestCombo, aes(x = category, y = dist, fill = category)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(values=c("brown1", "azure4")) +
+  coord_cartesian(ylim = c(0, 70)) +
+  geom_signif(comparisons = list(c("distToD", "distToA")),
+              map_signif_level = TRUE, 
+              textsize = 4,
+              y_position = 60) +
+  scale_x_discrete(limits = c("distToA", "distToD"), labels = c("distToA" = paste0("distance from ", markerB, " to ", markerA), "distToD" = paste0("distance from ", markerB, " to ", markerD))) +
+  labs(title = paste0("Average distance of the closest ", markerA, " or ", markerD, " from each ", markerB),
+       x = "",
+       y = "Distance (µm)") +
+  geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5) +
+  theme(legend.position = "none")
+plotClosest
+
+
+#to get summary data by group
+#tapply(dataToSummarize, summarizeByThis, summary)
+tapply(closestCombo$dist, closestCombo$category, summary)
+
+graphTitle = paste0(graphOutputPath, "/", "closest ", markerA, " or ", markerD, " from ", markerB, ".png")
+ggsave(graphTitle, plotClosest, width = 6, height = 4, units = "in", dpi = 600)
+
+```
+
+
+Analyzing nearest neighbors of C+ B
+```{r, include = FALSE}
+setwd(workingDir)
+
+closestA_B.C = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("distA_B.C", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  closestA_B.C = rbind(closestA_B.C, temp)
+}
+
+colnames(closestA_B.C) = c("dist")
+closestA_B.C$category = "distToA"
+
+
+
+closestD_B.C = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("distD_B.C", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  closestD_B.C = rbind(closestD_B.C, temp)
+}
+
+colnames(closestD_B.C) = c("dist")
+closestD_B.C$category = "distToD"
+
+
+closestCombo_B.C = rbind(closestA_B.C, closestD_B.C)
+```
+
+Finds the average distance of the closest A or D from each C+ B
+```{r}
+
+medians = aggregate(dist ~ category, data = closestCombo_B.C, FUN = median)
+
+plotClosestB.C = ggplot(data = closestCombo_B.C, aes(x = category, y = dist, fill = category)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(values=c("brown1", "azure4")) +
+  coord_cartesian(ylim = c(0, 85)) +
+  geom_signif(comparisons = list(c("distToA", "distToD")),
+              map_signif_level = TRUE, 
+              textsize = 4,
+              y_position = 75) +
+  scale_x_discrete(limits = c("distToA", "distToD"), labels = c("distToA" = paste0("distance from ", markerC, "+ ", markerB, " to ", markerA), "distToD" = paste0("distance from ", markerC, "+ ", markerB, " to ", markerD))) +
+  labs(title = paste0("Average distance of the closest ", markerA, " or ", markerD, " from each ", markerC, "+ ", markerB),
+       x = "",
+       y = "Distance (µm)") +
+  geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5) +
+  theme(legend.position = "none")
+plotClosestB.C
+
+
+#to get summary data by group
+#tapply(dataToSummarize, summarizeByThis, summary)
+tapply(closestCombo_B.C$dist, closestCombo_B.C$category, summary)
+
+graphTitle = paste0(graphOutputPath, "/", "closest ", markerA, " or ", markerD, " from ", markerC, "+ ", markerB, ".png")
+ggsave(graphTitle, plotClosestB.C, width = 6, height = 4, units = "in", dpi = 600)
+```
+
+
+
+```{r, include = FALSE}
+setwd(workingDir)
+
+closestCell = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("CTRdistCell", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  closestCell = rbind(closestCell, temp)
+}
+
+colnames(closestCell) = c("dist")
+closestCell$category = "distToCell"
+```
+
+CONTROL: finding the distance to the closest cell from each B
+```{r}
+medians = aggregate(dist ~ category, data = closestCell, FUN = median)
+
+plotClosestCell = ggplot(data = closestCell, aes(x = category, y = dist, fill = category)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(values = c("azure4")) +
+  coord_cartesian(ylim = c(0, 15)) +
+  scale_x_discrete(limits = c("distToCell"), labels = c("distToCell" = paste0("distance from ", markerB, " to closest Cell"))) +
+  labs(title = paste0("Control: Average distance of the closest cell from each ", markerB),
+       x = "",
+       y = "Distance (µm)") +
+  geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5, color = "white") +
+  theme(legend.position = "none")
+plotClosestCell
+
+graphTitle = paste0(graphOutputPath, "/", "Control; closest Cell from ", markerB, ".png")
+ggsave(graphTitle, plotClosestCell, width = 6, height = 4, units = "in", dpi = 600)
+
+```
+
+
+Opposite
+```{r, include = FALSE}
+setwd(workingDir)
+
+AclosestB = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("OppdistB", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  AclosestB = rbind(AclosestB, temp)
+}
+
+colnames(AclosestB) = c("dist")
+AclosestB$category = "AdistToB"
+
+
+
+DclosestB = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("OppdistD", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  DclosestB = rbind(DclosestB, temp)
+}
+
+colnames(DclosestB) = c("dist")
+DclosestB$category = "DdistToB"
+
+
+closestB = rbind(AclosestB, DclosestB)
+```
+
+Opposite: Finds the average distance of the closest B from every A or D
+```{r}
+medians = aggregate(dist ~ category, data = closestB, FUN = median)
+
+plotClosestB = ggplot(data = closestB, aes(x = category, y = dist, fill = category)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(values=c("brown1", "azure4")) +
+  coord_cartesian(ylim = c(0, 60)) +
+  geom_signif(comparisons = list(c("AdistToB", "DdistToB")),
+              map_signif_level = TRUE, 
+              textsize = 4,
+              y_position = 50) +
+  scale_x_discrete(limits = c("AdistToB", "DdistToB"), labels = c("AdistToB" = paste0("distance from ", markerA, " to ", markerB), "DdistToB" = paste0("distance from ", markerD, " to ", markerB))) +
+  labs(title = paste0("Average distance of the closest ", markerB, " from each ", markerA,  " or ",  markerD),
+       x = "",
+       y = "Distance (µm)") +
+  geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5) +
+  theme(legend.position = "none")
+plotClosestB
+
+graphTitle = paste0(graphOutputPath, "/", "closest ", markerB, " from ", markerA, " or ", markerD, ".png")
+ggsave(graphTitle, plotClosestB, width = 6, height = 4, units = "in", dpi = 600)
+```
+
+
+Opposite for 10
+```{r, include = FALSE}
+setwd(workingDir)
+
+A10closestB = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("AdistToClosest10B", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  A10closestB = rbind(A10closestB, temp)
+}
+
+colnames(A10closestB) = c("dist")
+A10closestB$category = "AdistTo10B"
+
+
+
+D10closestB = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("DdistToClosest10B", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  D10closestB = rbind(D10closestB, temp)
+}
+
+colnames(D10closestB) = c("dist")
+D10closestB$category = "DdistTo10B"
+
+
+closest10B = rbind(A10closestB, D10closestB)
+```
+
+Opposite for 10: Finds the average distance of the closest 10 Bs from every A or D
+```{r}
+medians = aggregate(dist ~ category, data = closest10B, FUN = median)
+
+plotClosest10B = ggplot(data = closest10B, aes(x = category, y = dist, fill = category)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(values=c("brown1", "azure4")) +
+  coord_cartesian(ylim = c(0, 80)) +
+  geom_signif(comparisons = list(c("AdistTo10B", "DdistTo10B")),
+              map_signif_level = TRUE, 
+              textsize = 4,
+              y_position = 70) +
+  scale_x_discrete(limits = c("AdistTo10B", "DdistTo10B"), labels = c("AdistTo10B" = paste0("distance from ", markerA, " to 10 closest ", markerB), "DdistTo10B" = paste0("distance from ", markerD, " to 10 closest ", markerB))) +
+  labs(title = paste0("Average distance of the closest 10 ", markerB, " cells from each ", markerA, " or ", markerD),
+       x = "",
+       y = "Distance (µm)") +
+  geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5) +
+  theme(legend.position = "none")
+plotClosest10B
+
+graphTitle = paste0(graphOutputPath, "/", "closest 10 ", markerB, "s from ", markerA, " or ", markerD, ".png")
+ggsave(graphTitle, plotClosest10B, width = 6, height = 4, units = "in", dpi = 600)
+```
+
+
+Opposite (C+)
+```{r, include = FALSE}
+setwd(workingDir)
+
+AclosestB.C = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("OppAdistB.C", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  AclosestB.C = rbind(AclosestB.C, temp)
+}
+
+colnames(AclosestB.C) = c("dist")
+AclosestB.C$category = "AdistToB.C"
+
+
+
+DclosestB.C = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("OppDdistB.C", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  DclosestB.C = rbind(DclosestB.C, temp)
+}
+
+colnames(DclosestB.C) = c("dist")
+DclosestB.C$category = "DdistToB.C"
+
+
+closestB.C = rbind(AclosestB.C, DclosestB.C)
+```
+
+Opposite (C+): Finds the average distance of the closest C+ B from every A or D
+```{r}
+medians = aggregate(dist ~ category, data = closestB.C, FUN = median)
+
+plotClosestB.C = ggplot(data = closestB.C, aes(x = category, y = dist, fill = category)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(values=c("brown1", "azure4")) +
+  coord_cartesian(ylim = c(0, 110)) +
+  geom_signif(comparisons = list(c("AdistToB.C", "DdistToB.C")),
+              map_signif_level = TRUE, 
+              textsize = 4,
+              y_position = 100) +
+  scale_x_discrete(limits = c("AdistToB.C", "DdistToB.C"), labels = c("AdistToB.C" = paste0("distance from ", markerA, " to ", markerC, "+ ", markerB), "DdistToB.C" = paste0("distance from ", markerD, " to ", markerC, "+ ", markerB))) +
+    labs(title = paste0("Average distance of the closest ", markerC, "+ ", markerB, " from each ", markerA, " or ", markerD),
+       x = "",
+       y = "Distance (µm)") +
+  geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5) +
+  theme(legend.position = "none")
+plotClosestB.C
+
+graphTitle = paste0(graphOutputPath, "/", "closest ", markerC, "+ ", markerB, " from ", markerA, " or ", markerD, ".png")
+ggsave(graphTitle, plotClosestB.C, width = 6, height = 4, units = "in", dpi = 600)
+
+```
+
+
+Control for Opposite (C+)
+```{r, include = FALSE}
+setwd(workingDir)
+
+AclosestCell = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("CTRAdistCell", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  AclosestCell = rbind(AclosestCell, temp)
+}
+
+colnames(AclosestCell) = c("dist")
+AclosestCell$category = "AdistToCell"
+
+
+
+DclosestCell = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("CTRDdistCell", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  DclosestCell = rbind(DclosestCell, temp)
+}
+
+colnames(DclosestCell) = c("dist")
+DclosestCell$category = "DdistToCell"
+
+
+CTRclosestCell = rbind(AclosestCell, DclosestCell)
+```
+
+Control for Opposite (C+): Finds the average distance of the closest cell from every A or D
+```{r}
+medians = aggregate(dist ~ category, data = CTRclosestCell, FUN = median)
+
+plotCTRClosestCell = ggplot(data = CTRclosestCell, aes(x = category, y = dist, fill = category)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(values=c("azure4", "brown1")) +
+  coord_cartesian(ylim = c(0, 25)) +
+  geom_signif(comparisons = list(c("AdistToCell", "DdistToCell")),
+              map_signif_level = TRUE, 
+              textsize = 4,
+              y_position = 15) +
+  scale_x_discrete(limits = c("AdistToCell", "DdistToCell"), labels = c("AdistToCell" = paste0("distance from ", markerA, " to Cell"), "DdistToCell" = paste0("distance from ", markerD, " to Cell"))) +
+  labs(title = paste0("Control for Opposite: Average distance of the closest cell from each ", markerA, " or ", markerD),
+       x = "",
+       y = "Distance (µm)") +
+  geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5, color = "black") +
+  theme(legend.position = "none")
+plotCTRClosestCell
+
+graphTitle = paste0(graphOutputPath, "/", "closest Cell from ", markerA, " or ", markerD, ".png")
+ggsave(graphTitle, plotCTRClosestCell, width = 6, height = 4, units = "in", dpi = 600)
+
+```
+
+
