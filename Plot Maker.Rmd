@@ -36,8 +36,12 @@ markerB = "CD68"
 markerC = "PD-L1"
 markerD = "Neither"
 
-workingDir = "" #Path to the folder with output CSV files (make sure to use backwards slashes)
-graphOutputPath = "" #Path to the folder where you want to save the graphs
+workingDir = "C:/Users/arisi/Dropbox (UFL)/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/PDAC Images/Output" #folder with output of Data Analysis
+
+graphOutputPath = "C:/Users/arisi/UFL Dropbox/Aryeh Silver/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/Figures/PDAC Graphs" #folder where you want to save the graphs
+
+#workingDir = "" #Path to the folder with output CSV files (make sure to use backwards slashes)
+#graphOutputPath = "" #Path to the folder where you want to save the graphs
 
 ```
 
@@ -53,6 +57,12 @@ for (n in 1:numberOfImages) {
   tempCombo = read_csv(fileName)
   newCombo = rbind(newCombo, tempCombo)
 }
+
+newCombo = newCombo %>%
+  mutate(CnotBCprop1 = Bprop1 - B.Cprop1,
+         CnotBCprop2 = Bprop2 - B.Cprop2,
+         CnotBCprop3 = Bprop3 - B.Cprop3,
+         CnotBCprop = Bprop - B.Cprop)
 ```
 
 Run to just analyze ONE image at a time
@@ -63,7 +73,16 @@ n = 3 #put the image number here
 
 fileName = paste0("newCombo", n, ".csv")
 newCombo = read_csv(fileName)
+
+newCombo = newCombo %>%
+  mutate(CnotBCprop1 = Bprop1 - B.Cprop1,
+         CnotBCprop2 = Bprop2 - B.Cprop2,
+         CnotBCprop3 = Bprop3 - B.Cprop3,
+         CnotBCprop = Bprop - B.Cprop)
 ```
+
+
+
 
 Creating data tables
 
@@ -74,120 +93,148 @@ Creating data tables
 totalObservations = table(newCombo$identityCat)
 totalObservations
 
-medians = aggregate(Bprop ~ identityCat, data = newCombo, FUN = median)
 
-boxwhiskerB = ggplot(newCombo, aes(x = identityCat, y = Bprop, fill = identityCat)) +
+
+# for B
+
+newCombo = newCombo %>%
+  mutate(Bpercent = Bprop * 100)
+
+medians = aggregate(Bpercent ~ identityCat, data = newCombo, FUN = median)
+
+boxwhiskerB = ggplot(newCombo, aes(x = identityCat, y = Bpercent, fill = identityCat)) +
   geom_boxplot(outlier.shape = NA, color = "black") +
-  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("deepskyblue2", "deepskyblue2", "deepskyblue2")) +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("brown1", "deepskyblue2", "azure4")) +
   labs(title = paste0(markerB, " Neighbor Comparison"),
        x = "Classification",
-       y = paste0("Proportion of neighbors that are ", markerB)) +
-  coord_cartesian(ylim = c(0, 1.25)) +
-  geom_signif(comparisons = list(c("B", "A"), c("A", "D"), c("B", "D")),
+       y = paste0("Percent of neighbors that are ", markerB)) +
+  coord_cartesian(ylim = c(0, 125)) +
+  geom_signif(comparisons = list(c("A", "B"), c("B", "D"), c("A", "D")),
               map_signif_level = TRUE, 
               textsize = 4,
-              y_position = c(1, 1.08, 1.16)) +
-  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("B", "A", "D")) +
-  geom_text(data = medians, aes(label = round(Bprop, 2)), vjust = -0.2) +
+              y_position = c(100, 108, 116)) +
+  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("A", "B", "D")) +
+  geom_text(data = medians, aes(label = round(Bpercent, 2)), vjust = -0.2, color = "white") +
   theme(legend.position = "none")
 boxwhiskerB
 
 graphTitle = paste0(graphOutputPath, "/", markerB, " Neighbor Comparison", ".png")
-ggsave(graphTitle, boxwhiskerB, width = 6, height = 4, units = "in", dpi = 600)
+ggsave(graphTitle, boxwhiskerB, width = 6, height = 7, units = "in", dpi = 600)
 
 
 
-medians = aggregate(Aprop ~ identityCat, data = newCombo, FUN = median)
+# for A
 
-boxwhiskerA = ggplot(newCombo, aes(x = identityCat, y = Aprop, fill = identityCat)) +
+newCombo = newCombo %>%
+  mutate(Apercent = Aprop * 100)
+
+medians = aggregate(Apercent ~ identityCat, data = newCombo, FUN = median)
+
+boxwhiskerA = ggplot(newCombo, aes(x = identityCat, y = Apercent, fill = identityCat)) +
   geom_boxplot(outlier.shape = NA, color = "black") +
-  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("brown1", "brown1", "brown1")) +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("brown1", "deepskyblue2", "azure4")) +
   labs(title = paste0(markerA, " Neighbor Comparison"),
        x = "Classification",
-       y = paste0("Proportion of neighbors that are ", markerA)) +
-  coord_cartesian(ylim = c(0, 1.25)) +
-  geom_signif(comparisons = list(c("B", "A"), c("A", "D"), c("B", "D")),
+       y = paste0("Percent of neighbors that are ", markerA)) +
+  coord_cartesian(ylim = c(0, 125)) +
+  geom_signif(comparisons = list(c("A", "B"), c("B", "D"), c("A", "D")),
               map_signif_level = TRUE, 
               textsize = 4,
-              y_position = c(1, 1.08, 1.16)) +
-  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("B", "A", "D")) +
-  geom_text(data = medians, aes(label = round(Aprop, 2)), vjust = -0.2) +
+              y_position = c(100, 108, 116)) +
+  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("A", "B", "D")) +
+  geom_text(data = medians, aes(label = round(Apercent, 2)), vjust = -0.2, color = "white") +
   theme(legend.position = "none")
 boxwhiskerA
 
 graphTitle = paste0(graphOutputPath, "/", markerA, " Neighbor Comparison", ".png")
-ggsave(graphTitle, boxwhiskerA, width = 6, height = 4, units = "in", dpi = 600)
+ggsave(graphTitle, boxwhiskerA, width = 6, height = 7, units = "in", dpi = 600)
 
 
+# for D
 
-medians = aggregate(Dprop ~ identityCat, data = newCombo, FUN = median)
+newCombo = newCombo %>%
+  mutate(Dpercent = Dprop * 100)
 
-boxwhiskerD = ggplot(newCombo, aes(x = identityCat, y = Dprop, fill = identityCat)) +
+medians = aggregate(Dpercent ~ identityCat, data = newCombo, FUN = median)
+
+boxwhiskerD = ggplot(newCombo, aes(x = identityCat, y = Dpercent, fill = identityCat)) +
   geom_boxplot(outlier.shape = NA, color = "black") +
-  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("azure4", "azure4", "azure4")) +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("brown1", "deepskyblue2", "azure4")) +
   labs(title = paste0(markerD, " Neighbor Comparison"),
        x = "Classification",
-       y = paste0("Proportion of neighbors that are ", markerD)) +
-  coord_cartesian(ylim = c(0, 1.25)) +
-  geom_signif(comparisons = list(c("B", "A"), c("A", "D"), c("B", "D")),
+       y = paste0("Percent of neighbors that are ", markerD)) +
+  coord_cartesian(ylim = c(0, 125)) +
+  geom_signif(comparisons = list(c("A", "B"), c("B", "D"), c("A", "D")),
               map_signif_level = TRUE, 
               textsize = 4,
-              y_position = c(1, 1.08, 1.16)) +
-  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("B", "A", "D")) +
-  geom_text(data = medians, aes(label = round(Dprop, 2)), vjust = -0.2) +
+              y_position = c(100, 108, 116)) +
+  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("A", "B", "D")) +
+  geom_text(data = medians, aes(label = round(Dpercent, 2)), vjust = -0.2, color = "white") +
   theme(legend.position = "none")
 boxwhiskerD
 
 graphTitle = paste0(graphOutputPath, "/", markerD, " Neighbor Comparison", ".png")
-ggsave(graphTitle, boxwhiskerD, width = 6, height = 4, units = "in", dpi = 600)
+ggsave(graphTitle, boxwhiskerD, width = 6, height = 7, units = "in", dpi = 600)
 
 
 
-medians = aggregate(Cprop ~ identityCat, data = newCombo, FUN = median)
+# for C
 
-boxwhiskerC = ggplot(newCombo, aes(x = identityCat, y = Cprop, fill = identityCat)) +
+newCombo = newCombo %>%
+  mutate(Cpercent = Cprop * 100)
+
+medians = aggregate(Cpercent ~ identityCat, data = newCombo, FUN = median)
+
+boxwhiskerC = ggplot(newCombo, aes(x = identityCat, y = Cpercent, fill = identityCat)) +
   geom_boxplot(outlier.shape = NA, color = "black") +
-  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("green3", "green3", "green3")) +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("brown1", "deepskyblue2", "azure4")) +
   labs(title = paste0(markerC, "+ Neighbor Comparison"),
        x = "Classification",
-       y = paste0("Proportion of neighbors that are ", markerC, "+")) +
-  coord_cartesian(ylim = c(0, 1.25)) +
-  geom_signif(comparisons = list(c("B", "A"), c("A", "D"), c("B", "D")),
+       y = paste0("Percent of neighbors that are ", markerC, "+")) +
+  coord_cartesian(ylim = c(0, 125)) +
+  geom_signif(comparisons = list(c("A", "B"), c("B", "D"), c("A", "D")),
               map_signif_level = TRUE, 
               textsize = 4,
-              y_position = c(1, 1.08, 1.16)) +
-  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("B", "A", "D")) +
-  geom_text(data = medians, aes(label = round(Cprop, 2)), vjust = -0.2) +
+              y_position = c(100, 108, 116)) +
+  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("A", "B", "D")) +
+  geom_text(data = medians, aes(label = round(Cpercent, 2)), vjust = -0.2, color = "white") +
   theme(legend.position = "none")
 boxwhiskerC
 
 graphTitle = paste0(graphOutputPath, "/", markerC, " Neighbor Comparison", ".png")
-ggsave(graphTitle, boxwhiskerC, width = 6, height = 4, units = "in", dpi = 600)
+ggsave(graphTitle, boxwhiskerC, width = 6, height = 7, units = "in", dpi = 600)
 
 
 
-medians = aggregate(B.Cprop ~ identityCat, data = newCombo, FUN = median)
+# for B.C
 
-boxwhiskerB.C = ggplot(newCombo, aes(x = identityCat, y = B.Cprop, fill = identityCat)) +
+newCombo = newCombo %>%
+  mutate(B.Cpercent = B.Cprop * 100)
+
+medians = aggregate(B.Cpercent ~ identityCat, data = newCombo, FUN = median)
+
+boxwhiskerB.C = ggplot(newCombo, aes(x = identityCat, y = B.Cpercent, fill = identityCat)) +
   geom_boxplot(outlier.shape = NA, color = "black") +
-  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("aquamarine", "aquamarine", "aquamarine")) +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("brown1", "deepskyblue2", "azure4")) +
   labs(title = paste0(markerC, "+ ", markerB, " Neighbor Comparison"),
        x = "Classification",
-       y = paste0("Proportion of neighbors that are ", markerC, "+ ", markerB)) +
-  coord_cartesian(ylim = c(0, 1.25)) +
-  geom_signif(comparisons = list(c("B", "A"), c("A", "D"), c("B", "D")),
+       y = paste0("Percent of neighbors that are ", markerC, "+ ", markerB)) +
+  coord_cartesian(ylim = c(0, 125)) +
+  geom_signif(comparisons = list(c("A", "B"), c("B", "D"), c("A", "D")),
               map_signif_level = TRUE,
               textsize = 4,
-              y_position = c(1, 1.08, 1.16)) +
-  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("B", "A", "D")) +
-  geom_text(data = medians, aes(label = round(B.Cprop, 2)), vjust = -0.2, color = "black") +
+              y_position = c(100, 108, 116)) +
+  scale_x_discrete(labels = c("B" = markerB, "A" = markerA, "D" = markerD), limits = c("A", "B", "D")) +
+  geom_text(data = medians, aes(label = round(B.Cpercent, 2)), vjust = -0.2, color = "white") +
   theme(legend.position = "none")
 boxwhiskerB.C
 
 graphTitle = paste0(graphOutputPath, "/", markerC, "+ ", markerB, " Neighbor Comparison", ".png")
-ggsave(graphTitle, boxwhiskerB.C, width = 6, height = 4, units = "in", dpi = 600)
+ggsave(graphTitle, boxwhiskerB.C, width = 6, height = 7, units = "in", dpi = 600)
 
 ```
+
+
 
 Plotting the cells on a grid (only use with one image!)
 ```{r}
@@ -272,7 +319,7 @@ ringBarB = ggplot(Bsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
        x = "",
        y = "",
        fill = "Classification") +
-  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2, color = "white") +
+  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 3, color = "white") +
   theme_void() +
   theme(axis.text.x = element_blank(), axis.text.y = element_blank())
 ringBarB
@@ -306,7 +353,7 @@ ringBarA = ggplot(Asummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
        x = "",
        y = "",
        fill = "Classification") +
-  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2, color = "white") +
+  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 3, color = "white") +
   theme_void() +
   theme(axis.text.x = element_blank(), axis.text.y = element_blank())
 ringBarA
@@ -340,7 +387,7 @@ ringBarD = ggplot(Dsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
        x = "",
        y = "",
        fill = "Classification") +
-  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2, color = "white") +
+  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 3, color = "white") +
   theme_void() +
   theme(axis.text.x = element_blank(), axis.text.y = element_blank())
 ringBarD
@@ -375,7 +422,7 @@ ringBarC.B = ggplot(C.Bsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
        x = "",
        y = "",
        fill = "Classification") +
-  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2, color = "white") +
+  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 3, color = "white") +
   theme_void() +
   theme(axis.text.x = element_blank(), axis.text.y = element_blank())
 ringBarC.B
@@ -384,6 +431,201 @@ graphTitle = paste0(graphOutputPath, "/", markerC, "+ ", markerB, " cells only P
 ggsave(graphTitle, ringBarC.B, width = 6, height = 4, units = "in", dpi = 600)
 
 ```
+
+
+
+Rings with B.C cells!
+```{r}
+#for only B cells
+B = newCombo[newCombo$identityCat == "B", ]
+longB = gather(B, key = "ring", value = "prop", c(Aprop1, Aprop2, Aprop3, B.Cprop1, B.Cprop2, B.Cprop3, CnotBCprop1, CnotBCprop2, CnotBCprop3,  Dprop1, Dprop2, Dprop3))
+Bsummary = longB %>%
+  drop_na(prop) %>%
+  group_by(ring) %>%
+  summarise(Mean = mean(prop),
+            SD = sd(prop)) %>%
+  mutate(ringNumber = case_when(grepl('prop1', ring) ~ "ring1",
+                                grepl('prop2', ring) ~ "ring2",
+                                grepl('prop3', ring) ~ "ring3")) %>%
+  group_by(ringNumber) %>%
+  mutate(typeCat = case_when(grepl('A', ring) ~ "A",
+                             grepl('B.C', ring) ~ "B.C",
+                             grepl('notBC', ring) ~ "CnotB.C",
+                             grepl('D', ring) ~ "D"))
+
+
+ringBarB = ggplot(Bsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
+  geom_col() +
+  scale_fill_manual(labels = c("A" = markerA, "B.C" = paste0(markerC, "+ ", markerB), "CnotB.C" = paste0(markerC, "- ", markerB), "D" = markerD),
+                    values = c("A" = "brown1", "B.C" = "deepskyblue", "CnotB.C" = "deepskyblue3", "D" = "azure4")) +
+  coord_polar("y") +
+  labs(title = paste0("Proportion of cell types within each ring for ", markerB, " cells"),
+       x = "",
+       y = "",
+       fill = "Classification") +
+  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2.5, color = "white") +
+  theme_void() +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+ringBarB
+
+graphTitle = paste0(graphOutputPath, "/", markerB, " rings with EXTRA", ".png")
+ggsave(graphTitle, ringBarB, width = 6, height = 4, units = "in", dpi = 600)
+
+
+#for only A cells
+A = newCombo[newCombo$identityCat == "A", ]
+longA = gather(A, key = "ring", value = "prop", c(Aprop1, Aprop2, Aprop3, B.Cprop1, B.Cprop2, B.Cprop3, CnotBCprop1, CnotBCprop2, CnotBCprop3,  Dprop1, Dprop2, Dprop3))
+Asummary = longA %>%
+  drop_na(prop) %>%
+  group_by(ring) %>%
+  summarise(Mean = mean(prop),
+            SD = sd(prop)) %>%
+  mutate(ringNumber = case_when(grepl('prop1', ring) ~ "ring1",
+                                grepl('prop2', ring) ~ "ring2",
+                                grepl('prop3', ring) ~ "ring3")) %>%
+  group_by(ringNumber) %>%
+  mutate(typeCat = case_when(grepl('A', ring) ~ "A",
+                             grepl('B.C', ring) ~ "B.C",
+                             grepl('notBC', ring) ~ "CnotB.C",
+                             grepl('D', ring) ~ "D"))
+
+
+ringBarA = ggplot(Asummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
+  geom_col() +
+  scale_fill_manual(labels = c("A" = markerA, "B.C" = paste0(markerC, "+ ", markerB), "CnotB.C" = paste0(markerC, "- ", markerB), "D" = markerD),
+                    values = c("A" = "brown1", "B.C" = "deepskyblue", "CnotB.C" = "deepskyblue3", "D" = "azure4")) +
+  coord_polar("y") +
+  labs(title = paste0("Proportion of cell types within each ring for ", markerA, " cells"),
+       x = "",
+       y = "",
+       fill = "Classification") +
+  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2.5, color = "white") +
+  theme_void() +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+ringBarA
+
+graphTitle = paste0(graphOutputPath, "/", markerA, " rings with EXTRA", ".png")
+ggsave(graphTitle, ringBarA, width = 6, height = 4, units = "in", dpi = 600)
+
+
+#for only D cells
+D = newCombo[newCombo$identityCat == "D", ]
+longD = gather(D, key = "ring", value = "prop", c(Aprop1, Aprop2, Aprop3, B.Cprop1, B.Cprop2, B.Cprop3, CnotBCprop1, CnotBCprop2, CnotBCprop3,  Dprop1, Dprop2, Dprop3))
+Dsummary = longD %>%
+  drop_na(prop) %>%
+  group_by(ring) %>%
+  summarise(Mean = mean(prop),
+            SD = sd(prop)) %>%
+  mutate(ringNumber = case_when(grepl('prop1', ring) ~ "ring1",
+                                grepl('prop2', ring) ~ "ring2",
+                                grepl('prop3', ring) ~ "ring3")) %>%
+  group_by(ringNumber) %>%
+  mutate(typeCat = case_when(grepl('A', ring) ~ "A",
+                             grepl('B.C', ring) ~ "B.C",
+                             grepl('notBC', ring) ~ "CnotB.C",
+                             grepl('D', ring) ~ "D"))
+
+
+ringBarD = ggplot(Dsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
+  geom_col() +
+  scale_fill_manual(labels = c("A" = markerA, "B.C" = paste0(markerC, "+ ", markerB), "CnotB.C" = paste0(markerC, "- ", markerB), "D" = markerD),
+                    values = c("A" = "brown1", "B.C" = "deepskyblue", "CnotB.C" = "deepskyblue3", "D" = "azure4")) +
+  coord_polar("y") +
+  labs(title = paste0("Proportion of cell types within each ring for ", markerD, " cells"),
+       x = "",
+       y = "",
+       fill = "Classification") +
+  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2.5, color = "white") +
+  theme_void() +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+ringBarD
+
+graphTitle = paste0(graphOutputPath, "/", markerD, " rings with EXTRA", ".png")
+ggsave(graphTitle, ringBarD, width = 6, height = 4, units = "in", dpi = 600)
+
+
+
+#for only C+ B cells
+C.B = newCombo[newCombo$identityCat == "B" & newCombo$identityC == "C+", ]
+longC.B = gather(C.B, key = "ring", value = "prop", c(Aprop1, Aprop2, Aprop3, B.Cprop1, B.Cprop2, B.Cprop3, CnotBCprop1, CnotBCprop2, CnotBCprop3,  Dprop1, Dprop2, Dprop3))
+C.Bsummary = longC.B %>%
+  drop_na(prop) %>%
+  group_by(ring) %>%
+  summarise(Mean = mean(prop),
+            SD = sd(prop)) %>%
+  mutate(ringNumber = case_when(grepl('prop1', ring) ~ "ring1",
+                                grepl('prop2', ring) ~ "ring2",
+                                grepl('prop3', ring) ~ "ring3")) %>%
+  group_by(ringNumber) %>%
+  mutate(typeCat = case_when(grepl('A', ring) ~ "A",
+                             grepl('B.C', ring) ~ "B.C",
+                             grepl('notBC', ring) ~ "CnotB.C",
+                             grepl('D', ring) ~ "D"))
+
+
+ringBarC.B = ggplot(C.Bsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
+  geom_col() +
+  scale_fill_manual(labels = c("A" = markerA, "B.C" = paste0(markerC, "+ ", markerB), "CnotB.C" = paste0(markerC, "- ", markerB), "D" = markerD),
+                    values = c("A" = "brown1", "B.C" = "deepskyblue", "CnotB.C" = "deepskyblue3", "D" = "azure4")) +
+  coord_polar("y") +
+  labs(title = paste0("Proportion of cell types within each ring for ", markerC, "+ ", markerB, " cells"),
+       x = "",
+       y = "",
+       fill = "Classification") +
+  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2.5, color = "white") +
+  theme_void() +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+ringBarC.B
+
+graphTitle = paste0(graphOutputPath, "/", markerC, "+ ", markerB, " rings with EXTRA", ".png")
+ggsave(graphTitle, ringBarC.B, width = 6, height = 4, units = "in", dpi = 600)
+
+```
+
+
+
+
+```{r}
+classSummary = newCombo %>%
+  count(identityCat)
+
+classPlot = ggplot(classSummary, aes(x = identityCat, y = n, fill = identityCat)) +
+  geom_col() +
+  labs(title = paste0("Number of cells per cell type"),
+       x = "Classification",
+       y = "Number of Cells",
+       fill = "Classification") +
+  scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("brown1", "deepskyblue2", "azure4")) +
+  scale_x_discrete(limits = c("A", "B", "D"), labels = c("B" = markerB, "A" = markerA, "D" = markerD)) +
+  geom_text(aes(label = n), vjust = 1.5, color = "white") +
+  theme(legend.position = "none")
+classPlot
+
+graphTitle = paste0(graphOutputPath, "/", "Number of cells per class", ".png")
+ggsave(graphTitle, classPlot, width = 6, height = 4, units = "in", dpi = 600)
+
+
+
+typeSummary = newCombo %>%
+  count(identityC)
+
+typePlot = ggplot(typeSummary, aes(x = identityC, y = n, fill = identityC)) +
+  geom_col() +
+  labs(title = paste0("Number of cells that are ", markerC, " + or -"),
+       x = "Type",
+       y = "Number of Cells",
+       fill = "Type") +
+  scale_fill_manual(labels = c("C+" = paste0(markerC, "+"), "C-" = paste0(markerC, "-")), values = c("C+" = "green3", "C-" = "azure4")) +
+  scale_x_discrete(limits = c("C+", "C-"), labels = c("C+" = paste0(markerC, "+"), "C-" = paste0(markerC, "-"))) +
+  geom_text(aes(label = n), vjust = 1.5, color = "white") +
+  theme(legend.position = "none")
+typePlot
+
+graphTitle = paste0(graphOutputPath, "/", "Number of cells per type", ".png")
+ggsave(graphTitle, typePlot, width = 6, height = 4, units = "in", dpi = 600)
+
+```
+
 
 
 ```{r}
@@ -417,27 +659,32 @@ Cbargraph = Cbargraph %>%
                               grepl('A', propName) ~ "A",
                               grepl('D', propName) ~ "D")) %>%
   group_by(identity) %>%
-  mutate(Cplusorminus = ifelse(propName == "A.Cprop" | propName == "B.Cprop" | propName == "D.Cprop", "C+", "C-"))
+  mutate(Cplusorminus = ifelse(propName == "A.Cprop" | propName == "B.Cprop" | propName == "D.Cprop", "C+", "C-")) %>%
+  mutate(percent = prop * 100)
 
 
-barC = ggplot(Cbargraph, aes(x = identity, y = prop, fill = Cplusorminus)) +
+
+barC = ggplot(Cbargraph, aes(x = identity, y = percent, fill = Cplusorminus)) +
   geom_bar(stat = "identity", position = position_fill(reverse = FALSE)) +
   scale_fill_manual(labels = c("C+" = paste0(markerC, "+"), "C-" = paste0(markerC, "-")), values = c("C+" = "green3", "C-" = "azure4")) +
-  labs(title = paste0("Proportion of ", markerC, "+ and ", markerC, "- for each cell type"),
+  labs(title = paste0("Percent of ", markerC, "+ and ", markerC, "- per cell type"),
        x = "Classification",
-       y = "Proportion",
+       y = "Percent",
        fill = "Identity") +
-  geom_text(aes(label = paste(round(prop, 3))), position = position_fill(reverse = FALSE), vjust = 2, color = "black") +
-  scale_x_discrete(limits = c("B", "A", "D"), labels = c("B" = markerB, "A" = markerA, "D" = markerD))
+  geom_text(aes(label = paste(round(percent, 2))), position = position_fill(reverse = FALSE), vjust = 2, color = "black") +
+  scale_x_discrete(limits = c("A", "B", "D"), labels = c("B" = markerB, "A" = markerA, "D" = markerD))
 barC
 
 graphTitle = paste0(graphOutputPath, "/", "Proportion of ", markerC, "+ and ", markerC, "- for each cell type", ".png")
 ggsave(graphTitle, barC, width = 6, height = 4, units = "in", dpi = 600)
 
 
+
+
+
 barCwithSIG = ggplot(newCombo, aes(x = identityCat, fill = identityC)) +
   geom_bar(position = "dodge") +
-  labs(title = paste0("Number of ", markerC, "+ and ", markerC, "- cells for each cell type"),
+  labs(title = paste0("Number of ", markerC, "+ and ", markerC, "- cells per cell type"),
        x = "Classification",
        y = "Number of Cells",
        fill = "Identity") +

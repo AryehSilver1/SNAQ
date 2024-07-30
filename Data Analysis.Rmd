@@ -34,8 +34,12 @@ markerA = "PanCK"
 markerB = "CD68"
 markerC = "PD-L1"
 
-inputFolder = "" #put the Path to the input folder (make sure to use backwards slashes)
-outputFolder = "" #put the Path to the output folder (make sure to use backwards slashes)
+inputFolder = "C:/Users/arisi/Dropbox (UFL)/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/PDAC Images/Input"
+
+outputFolder = "C:/Users/arisi/Dropbox (UFL)/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/PDAC Images/Output"
+
+#inputFolder = "" #put the Path to the input folder (make sure to use backwards slashes)
+#outputFolder = "" #put the Path to the output folder (make sure to use backwards slashes)
 
 ```
 
