@@ -308,10 +308,12 @@ Bsummary = longB %>%
   group_by(ringNumber) %>%
   mutate(typeCat = case_when(grepl('A', ring) ~ "A",
                              grepl('B', ring) ~ "B",
-                             grepl('D', ring) ~ "D"))
+                             grepl('D', ring) ~ "D")) %>%
+  mutate(meanPercent = Mean * 100,
+         SDpercent = SD * 100)
 
 
-ringBarB = ggplot(Bsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
+ringBarB = ggplot(Bsummary, aes(x = ringNumber, y = meanPercent, fill = typeCat)) +
   geom_col() +
   scale_fill_manual(labels = c("A" = markerA, "B" = markerB, "D" = markerD), values = c("brown1", "deepskyblue2", "azure4")) +
   coord_polar("y") +
@@ -319,7 +321,7 @@ ringBarB = ggplot(Bsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
        x = "",
        y = "",
        fill = "Classification") +
-  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 3, color = "white") +
+  geom_text(aes(label = round(meanPercent, 0)), position = position_stack(vjust = 0.5), size = 3, color = "white") +
   theme_void() +
   theme(axis.text.x = element_blank(), axis.text.y = element_blank())
 ringBarB
@@ -451,19 +453,21 @@ Bsummary = longB %>%
   mutate(typeCat = case_when(grepl('A', ring) ~ "A",
                              grepl('B.C', ring) ~ "B.C",
                              grepl('notBC', ring) ~ "CnotB.C",
-                             grepl('D', ring) ~ "D"))
+                             grepl('D', ring) ~ "D")) %>%
+  mutate(meanPercent = Mean * 100,
+         SDpercent = SD * 100)
 
 
-ringBarB = ggplot(Bsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
+ringBarB = ggplot(Bsummary, aes(x = ringNumber, y = meanPercent, fill = typeCat)) +
   geom_col() +
   scale_fill_manual(labels = c("A" = markerA, "B.C" = paste0(markerC, "+ ", markerB), "CnotB.C" = paste0(markerC, "- ", markerB), "D" = markerD),
                     values = c("A" = "brown1", "B.C" = "deepskyblue", "CnotB.C" = "deepskyblue3", "D" = "azure4")) +
   coord_polar("y") +
-  labs(title = paste0("Proportion of cell types within each ring for ", markerB, " cells"),
+  labs(title = paste0("Percent of cell types within each ring for ", markerB, " cells"),
        x = "",
        y = "",
        fill = "Classification") +
-  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2.5, color = "white") +
+  geom_text(aes(label = round(meanPercent, 0)), position = position_stack(vjust = 0.5), size = 2.5, color = "white") +
   theme_void() +
   theme(axis.text.x = element_blank(), axis.text.y = element_blank())
 ringBarB
@@ -487,19 +491,21 @@ Asummary = longA %>%
   mutate(typeCat = case_when(grepl('A', ring) ~ "A",
                              grepl('B.C', ring) ~ "B.C",
                              grepl('notBC', ring) ~ "CnotB.C",
-                             grepl('D', ring) ~ "D"))
+                             grepl('D', ring) ~ "D")) %>%
+  mutate(meanPercent = Mean * 100,
+         SDpercent = SD * 100)
 
 
-ringBarA = ggplot(Asummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
+ringBarA = ggplot(Asummary, aes(x = ringNumber, y = meanPercent, fill = typeCat)) +
   geom_col() +
   scale_fill_manual(labels = c("A" = markerA, "B.C" = paste0(markerC, "+ ", markerB), "CnotB.C" = paste0(markerC, "- ", markerB), "D" = markerD),
                     values = c("A" = "brown1", "B.C" = "deepskyblue", "CnotB.C" = "deepskyblue3", "D" = "azure4")) +
   coord_polar("y") +
-  labs(title = paste0("Proportion of cell types within each ring for ", markerA, " cells"),
+  labs(title = paste0("Percent of cell types within each ring for ", markerA, " cells"),
        x = "",
        y = "",
        fill = "Classification") +
-  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2.5, color = "white") +
+  geom_text(aes(label = round(meanPercent, 0)), position = position_stack(vjust = 0.5), size = 2.5, color = "white") +
   theme_void() +
   theme(axis.text.x = element_blank(), axis.text.y = element_blank())
 ringBarA
@@ -523,19 +529,21 @@ Dsummary = longD %>%
   mutate(typeCat = case_when(grepl('A', ring) ~ "A",
                              grepl('B.C', ring) ~ "B.C",
                              grepl('notBC', ring) ~ "CnotB.C",
-                             grepl('D', ring) ~ "D"))
+                             grepl('D', ring) ~ "D")) %>%
+  mutate(meanPercent = Mean * 100,
+         SDpercent = SD * 100)
 
 
-ringBarD = ggplot(Dsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
+ringBarD = ggplot(Dsummary, aes(x = ringNumber, y = meanPercent, fill = typeCat)) +
   geom_col() +
   scale_fill_manual(labels = c("A" = markerA, "B.C" = paste0(markerC, "+ ", markerB), "CnotB.C" = paste0(markerC, "- ", markerB), "D" = markerD),
                     values = c("A" = "brown1", "B.C" = "deepskyblue", "CnotB.C" = "deepskyblue3", "D" = "azure4")) +
   coord_polar("y") +
-  labs(title = paste0("Proportion of cell types within each ring for ", markerD, " cells"),
+  labs(title = paste0("Percent of cell types within each ring for ", markerD, " cells"),
        x = "",
        y = "",
        fill = "Classification") +
-  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2.5, color = "white") +
+  geom_text(aes(label = round(meanPercent, 0)), position = position_stack(vjust = 0.5), size = 2.5, color = "white") +
   theme_void() +
   theme(axis.text.x = element_blank(), axis.text.y = element_blank())
 ringBarD
@@ -560,19 +568,21 @@ C.Bsummary = longC.B %>%
   mutate(typeCat = case_when(grepl('A', ring) ~ "A",
                              grepl('B.C', ring) ~ "B.C",
                              grepl('notBC', ring) ~ "CnotB.C",
-                             grepl('D', ring) ~ "D"))
+                             grepl('D', ring) ~ "D")) %>%
+  mutate(meanPercent = Mean * 100,
+         SDpercent = SD * 100)
 
 
-ringBarC.B = ggplot(C.Bsummary, aes(x = ringNumber, y = Mean, fill = typeCat)) +
+ringBarC.B = ggplot(C.Bsummary, aes(x = ringNumber, y = meanPercent, fill = typeCat)) +
   geom_col() +
   scale_fill_manual(labels = c("A" = markerA, "B.C" = paste0(markerC, "+ ", markerB), "CnotB.C" = paste0(markerC, "- ", markerB), "D" = markerD),
                     values = c("A" = "brown1", "B.C" = "deepskyblue", "CnotB.C" = "deepskyblue3", "D" = "azure4")) +
   coord_polar("y") +
-  labs(title = paste0("Proportion of cell types within each ring for ", markerC, "+ ", markerB, " cells"),
+  labs(title = paste0("Percent of cell types within each ring for ", markerC, "+ ", markerB, " cells"),
        x = "",
        y = "",
        fill = "Classification") +
-  geom_text(aes(label = round(Mean, 2)), position = position_stack(vjust = 0.5), size = 2.5, color = "white") +
+  geom_text(aes(label = round(meanPercent, 0)), position = position_stack(vjust = 0.5), size = 2.5, color = "white") +
   theme_void() +
   theme(axis.text.x = element_blank(), axis.text.y = element_blank())
 ringBarC.B
@@ -665,18 +675,20 @@ Cbargraph = Cbargraph %>%
 
 
 barC = ggplot(Cbargraph, aes(x = identity, y = percent, fill = Cplusorminus)) +
-  geom_bar(stat = "identity", position = position_fill(reverse = FALSE)) +
+  geom_bar(stat = "identity") +
   scale_fill_manual(labels = c("C+" = paste0(markerC, "+"), "C-" = paste0(markerC, "-")), values = c("C+" = "green3", "C-" = "azure4")) +
   labs(title = paste0("Percent of ", markerC, "+ and ", markerC, "- per cell type"),
        x = "Classification",
        y = "Percent",
        fill = "Identity") +
-  geom_text(aes(label = paste(round(percent, 2))), position = position_fill(reverse = FALSE), vjust = 2, color = "black") +
+  geom_text(aes(label = paste(round(percent, 2))), position = position_stack(vjust = 0.4), color = "white") +
   scale_x_discrete(limits = c("A", "B", "D"), labels = c("B" = markerB, "A" = markerA, "D" = markerD))
 barC
 
 graphTitle = paste0(graphOutputPath, "/", "Proportion of ", markerC, "+ and ", markerC, "- for each cell type", ".png")
-ggsave(graphTitle, barC, width = 6, height = 4, units = "in", dpi = 600)
+ggsave(graphTitle, barC, width = 6, height = 6, units = "in", dpi = 600)
+
+
 
 
 
@@ -749,7 +761,7 @@ plotClosest = ggplot(data = closestCombo, aes(x = category, y = dist, fill = cat
               textsize = 4,
               y_position = 60) +
   scale_x_discrete(limits = c("distToA", "distToD"), labels = c("distToA" = paste0("distance from ", markerB, " to ", markerA), "distToD" = paste0("distance from ", markerB, " to ", markerD))) +
-  labs(title = paste0("Average distance of the closest ", markerA, " or ", markerD, " from each ", markerB),
+  labs(title = paste0("Closest ", markerA, " or ", markerD, " from each ", markerB),
        x = "",
        y = "Distance (µm)") +
   geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5) +
@@ -813,7 +825,7 @@ plotClosestB.C = ggplot(data = closestCombo_B.C, aes(x = category, y = dist, fil
               textsize = 4,
               y_position = 75) +
   scale_x_discrete(limits = c("distToA", "distToD"), labels = c("distToA" = paste0("distance from ", markerC, "+ ", markerB, " to ", markerA), "distToD" = paste0("distance from ", markerC, "+ ", markerB, " to ", markerD))) +
-  labs(title = paste0("Average distance of the closest ", markerA, " or ", markerD, " from each ", markerC, "+ ", markerB),
+  labs(title = paste0("Closest ", markerA, " or ", markerD, " from each ", markerC, "+ ", markerB),
        x = "",
        y = "Distance (µm)") +
   geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5) +
@@ -855,7 +867,7 @@ plotClosestCell = ggplot(data = closestCell, aes(x = category, y = dist, fill = 
   scale_fill_manual(values = c("azure4")) +
   coord_cartesian(ylim = c(0, 15)) +
   scale_x_discrete(limits = c("distToCell"), labels = c("distToCell" = paste0("distance from ", markerB, " to closest Cell"))) +
-  labs(title = paste0("Control: Average distance of the closest cell from each ", markerB),
+  labs(title = paste0("Control: Closest cell from each ", markerB),
        x = "",
        y = "Distance (µm)") +
   geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5, color = "white") +
@@ -913,7 +925,7 @@ plotClosestB = ggplot(data = closestB, aes(x = category, y = dist, fill = catego
               textsize = 4,
               y_position = 50) +
   scale_x_discrete(limits = c("AdistToB", "DdistToB"), labels = c("AdistToB" = paste0("distance from ", markerA, " to ", markerB), "DdistToB" = paste0("distance from ", markerD, " to ", markerB))) +
-  labs(title = paste0("Average distance of the closest ", markerB, " from each ", markerA,  " or ",  markerD),
+  labs(title = paste0("Closest ", markerB, " from each ", markerA,  " or ",  markerD),
        x = "",
        y = "Distance (µm)") +
   geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5) +
@@ -970,7 +982,7 @@ plotClosest10B = ggplot(data = closest10B, aes(x = category, y = dist, fill = ca
               textsize = 4,
               y_position = 70) +
   scale_x_discrete(limits = c("AdistTo10B", "DdistTo10B"), labels = c("AdistTo10B" = paste0("distance from ", markerA, " to 10 closest ", markerB), "DdistTo10B" = paste0("distance from ", markerD, " to 10 closest ", markerB))) +
-  labs(title = paste0("Average distance of the closest 10 ", markerB, " cells from each ", markerA, " or ", markerD),
+  labs(title = paste0("Closest 10 ", markerB, " cells from each ", markerA, " or ", markerD),
        x = "",
        y = "Distance (µm)") +
   geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5) +
@@ -1027,7 +1039,7 @@ plotClosestB.C = ggplot(data = closestB.C, aes(x = category, y = dist, fill = ca
               textsize = 4,
               y_position = 100) +
   scale_x_discrete(limits = c("AdistToB.C", "DdistToB.C"), labels = c("AdistToB.C" = paste0("distance from ", markerA, " to ", markerC, "+ ", markerB), "DdistToB.C" = paste0("distance from ", markerD, " to ", markerC, "+ ", markerB))) +
-    labs(title = paste0("Average distance of the closest ", markerC, "+ ", markerB, " from each ", markerA, " or ", markerD),
+    labs(title = paste0("Closest ", markerC, "+ ", markerB, " from each ", markerA, " or ", markerD),
        x = "",
        y = "Distance (µm)") +
   geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5) +
@@ -1085,7 +1097,7 @@ plotCTRClosestCell = ggplot(data = CTRclosestCell, aes(x = category, y = dist, f
               textsize = 4,
               y_position = 15) +
   scale_x_discrete(limits = c("AdistToCell", "DdistToCell"), labels = c("AdistToCell" = paste0("distance from ", markerA, " to Cell"), "DdistToCell" = paste0("distance from ", markerD, " to Cell"))) +
-  labs(title = paste0("Control for Opposite: Average distance of the closest cell from each ", markerA, " or ", markerD),
+  labs(title = paste0("Control for Opposite: Closest cell from each ", markerA, " or ", markerD),
        x = "",
        y = "Distance (µm)") +
   geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5, color = "black") +
