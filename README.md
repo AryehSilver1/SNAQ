@@ -90,10 +90,10 @@ The script offers functionality for:
   - Run the relevant code section for generating the cell grid plot.
   - Adjust visualization parameters to enhance clarity and insight.
 
-### LS+ Cell Count Bar Graph
-- **Description**: Displays counts of LS+ and LS-negative cells across different cell types using a bar graph.
+### C+ Cell Count Bar Graph
+- **Description**: Displays counts of C+ and C- cells across different cell types using a bar graph.
 - **Instructions**:
-  - Confirm that data columns correctly indicate LS+ status.
+  - Confirm that data columns correctly indicate C+ status.
   - Execute the bar graph plotting code provided in the R Markdown.
   - Modify the bar colors and labels to ensure readability.
 
