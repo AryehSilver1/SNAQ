@@ -1,5 +1,5 @@
 
-## README for Data Analysis
+## README For Image Acquisition
 
 ### Description
 The R Markdown document titled "Template Data Analysis" automates the analysis of immunohistochemically stained tissue samples at the single-cell level using RStudio. The primary focus is on neighborhood analysis of cellular interactions within fluorescently-stained samples. The methodology integrates image processing, cellular classification, and geospatial analysis to identify and visualize spatial patterns of different cell types and their proliferation markers.
@@ -8,9 +8,11 @@ The R Markdown document titled "Template Data Analysis" automates the analysis o
 Analyzing the local microenvironment around tumor cells can provide crucial insights into the interactions between tumor and immune cells. This document provides a framework to quantify these interactions by analyzing the distances between cell types within specified radii and visualizing these relationships.
 
 ### Methods
-1. **Image Acquisition**: Fluorescent images are acquired using a specific microscope and processed with Zeiss ZEN software.
-2. **Data Classification in QuPath**: Cells are detected and classified into types based on their staining markers. Data is exported as CSV files for each image.
-3. **R Analysis**: The R script processes each image data individually to analyze the neighborhood relationships between cells using distances calculated from their coordinates.
+1. **Image Acquisition**: Fluorescent images are acquired using a fluorescent microscope.
+2. **Data Classification in QuPath**: Cells are detected and classified into types based on their staining markers. Data is exported as CSV files for each image. Refer to the paper for specifics on how to process images using QuPath.
+3. **R Analysis**: The R script processes image data in bulk to analyze the neighborhood relationships between cells using distances calculated from their coordinates.
+
+## README For "Data Analysis.Rmd"
 
 ### Setup
 1. **Install R and RStudio**: Ensure you have R and RStudio installed on your system. You can download them from [CRAN](https://cran.r-project.org) and [RStudio's website](https://rstudio.com/products/rstudio/download/), respectively.
@@ -20,12 +22,12 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
    install.packages(c("readxl", "tidyverse", "data.table", "foreach", "doParallel"))
    ```
 
-3. **Data Preparation**: Prepare your input data in CSV format. The expected structure should include measurements relevant to the markers defined in the script.
+3. **Data Preparation**: Import data from QuPath into R Studio by running the "Importing data table" code chunk.<br>NOTE: If your images are from a larger stitch, run the code chunk labeled "Separates the full data CSV file into separate CSV files for each ROI" and fill in the information for the ROI centroid locations before loading in your data
 
 ### Configuration
 - Modify the variable section to match your dataset specifics, including:
-  - `dist1`, `dist2`, `dist3`: Distances for measurement rings.
-  - `maxXum`, `maxYum`: Image dimensions.
+  - `dist1`, `dist2`, `dist3`: Distances for the radius of each concentric ring (smallest to largest).
+  - `maxXum`, `maxYum`: Image dimensions in microns.
   - `numImages`: Total number of images to analyze.
   - `markerA`, `markerB`, `markerC`: Markers to analyze.
   - `inputFolder`, `outputFolder`: Directories for input and output data.
@@ -52,28 +54,17 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
 
 
 
-# README for Plot Maker
+# README for "Plot Maker.Rmd"
 
-## General Setup and Libraries
-This script requires a suite of R packages for data manipulation and visualization:
-- `readxl`: For reading Excel files.
-- `tidyverse`: For data manipulation and visualization.
-- `dplyr`: For data manipulation.
-- `ggplot2`: For creating static graphics.
-- `ggbreak`: For managing plot aesthetics.
-- `patchwork`: For arranging plots.
-- `ggdark`: For creating dark-themed plots.
-- `ggpubr`: For enhancing ggplot figures.
-- `rstatix`: For statistical operations.
-- `data.table`: For high-performance data manipulation.
-- `scales`: For scale functions for visualization.
-- `plotly`: For creating interactive plots.
-- `xlsx`: For reading and writing .xlsx files.
+**Install Required Packages**: Open RStudio and install the required libraries by running:
+   ```R
+   install.packages(c("readxl", "tidyverse", "ggsignif", "ggdark", "data.table", "ggthemes"))
+   ```
 
 Ensure all these packages are installed and loaded as indicated in your R script to handle data manipulation and plotting tasks efficiently.
 
 ## Data Initialization
-Variables such as `dist1`, `dist2`, `dist3` (distances for measurement rings), `maxXum`, `maxYum` (image dimensions), and `numberOfImages` are set up at the beginning of the script. Adjust these variables according to your dataset specifics.
+Variables such as `dist1`, `dist2`, `dist3` (distances for measurement rings), `maxXum`, `maxYum` (image dimensions), and `numberOfImages` are set up at the beginning of the script. Adjust these variables according to your dataset specifics, ensuring they remain the same as in "data analysis.rmd".
 
 ## Data Combining and Analysis
 The script offers functionality for:
