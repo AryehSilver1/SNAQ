@@ -12,6 +12,10 @@ SNAQ provides tools for analyzing immunohistochemically stained tissue samples a
 6. [Running the Analysis](#running-the-analysis)
 7. [Output](#output)
 8. [Example Outputs](#example-outputs)
+9. [README 1: README For "Data Analysis.Rmd"](#readme-1-template-data-analysis)
+10. [README 2: README for "Plot Maker.Rmd"](#readme-2-plotting-functions)
+
+### README For Image Acquisition
 
 ### Description
 The R Markdown document titled "Template Data Analysis" automates the analysis of immunohistochemically stained tissue samples at the single-cell level using RStudio. The primary focus is on neighborhood analysis of cellular interactions within fluorescently-stained samples. The methodology integrates image processing, cellular classification, and geospatial analysis to identify and visualize spatial patterns of different cell types and their proliferation markers.
@@ -66,7 +70,7 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
 
 
 
-# README for "Plot Maker.Rmd"
+### README for "Plot Maker.Rmd"
 
 **Install Required Packages**: Open RStudio and install the required libraries by running:
    ```R
