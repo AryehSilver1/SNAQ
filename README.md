@@ -32,7 +32,7 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
 3. **R Analysis**: The R script processes image data in bulk to analyze the neighborhood relationships between cells using distances calculated from their coordinates.
 
 
-Below is a detailed explanation of the usage of two R scripts: `Data Analysis.Rmd` and `Plot Maker.Rmd`. Each README provides comprehensive instructions on setup, configuration, running the analysis, and understanding the outputs, ensuring a clear and efficient workflow for users.
+#Below is a detailed explanation of the usage of two R scripts: `Data Analysis.Rmd` and `Plot Maker.Rmd`. Each README provides comprehensive instructions on setup, configuration, running the analysis, and understanding the outputs, ensuring a clear and efficient workflow for users.
 
 
 ## README For "Data Analysis.Rmd"
