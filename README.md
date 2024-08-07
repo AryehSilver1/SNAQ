@@ -8,14 +8,17 @@ SNAQ provides tools for analyzing immunohistochemically stained tissue samples a
 2. [Background](#background)
 3. [Methods](#methods)
 4. [README For "Data Analysis.Rmd"](#readme-for-data-analysisrmd)
-5. [Setup](#setup)
-6. [Configuration](#configuration)
-7. [Running the Analysis](#running-the-analysis)
-8. [Output](#output)
-9. [Running the Test Data](#running-the-test-data)
-10. [README for "Plot Maker.Rmd"](#readme-for-plot-makerrmd)
-
-### README For Image Acquisition
+   - [Setup](#setup)
+   - [Configuration](#configuration)
+   - [Running the Analysis](#running-the-analysis)
+   - [Output](#output)
+5. [README for "Plot Maker.Rmd"](#readme-for-plot-makerrmd)
+   - [Data Initialization](#Data-Initialization)
+   - [Data Combining and Analysis](#Data-Combining-and-Analysis)
+   - [Plot Descriptions and Instructions](#Plot-Descriptions-and-Instructions)
+   - [Output](#output)
+6. [Running the Test Data](#running-the-test-data)
+   
 
 ### Description
 The R Markdown document titled "Template Data Analysis" automates the analysis of immunohistochemically stained tissue samples at the single-cell level using RStudio. The primary focus is on neighborhood analysis of cellular interactions within fluorescently-stained samples. The methodology integrates image processing, cellular classification, and geospatial analysis to identify and visualize spatial patterns of different cell types and their proliferation markers.
@@ -27,6 +30,10 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
 1. **Image Acquisition**: Fluorescent images are acquired using a fluorescent microscope.
 2. **Data Classification in QuPath**: Cells are detected and classified into types based on their staining markers. Data is exported as CSV files for each image. Refer to the paper for specifics on how to process images using QuPath.
 3. **R Analysis**: The R script processes image data in bulk to analyze the neighborhood relationships between cells using distances calculated from their coordinates.
+
+
+The repository includes two detailed README files that explain the usage of two R scripts: `Data Analysis.Rmd` and `Plot Maker.Rmd`. Each README provides comprehensive instructions on setup, configuration, running the analysis, and understanding the outputs. Below are the detailed sections for each script, ensuring a clear and efficient workflow for users.
+
 
 ## README For "Data Analysis.Rmd"
 
@@ -48,12 +55,12 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
   - `markerA`, `markerB`, `markerC`: Markers to analyze.
   - `inputFolder`, `outputFolder`: Directories for input and output data.
     
-### Marker Types
+## Marker Types
 - **Marker A**: Represents a specific cell type A.
 - **Marker B**: Represents a specific cell type B.
 - **Marker C**: Represents a modifier marker that can modify Marker B.
 
-### Marker Interactions
+## Marker Interactions
 - **Marker C modifies Marker B**: Only Marker C has the ability to modify Marker B. This interaction is a key aspect of the analysis.
 
 ### Running the Analysis
@@ -64,7 +71,7 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
    ```
 3. Run the script by knitting the document in RStudio.
 
-## Output
+### Output
 - The output will be generated in the specified output directory and will include Neighbourhood analysis results based on the defined parameters.
 
 
@@ -79,17 +86,17 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
 
 Ensure all these packages are installed and loaded as indicated in your R script to handle data manipulation and plotting tasks efficiently.
 
-## Data Initialization
+### Data Initialization
 Variables such as `dist1`, `dist2`, `dist3` (distances for measurement rings), `maxXum`, `maxYum` (image dimensions), and `numberOfImages` are set up at the beginning of the script. Adjust these variables according to your dataset specifics, ensuring they remain the same as in "data analysis.rmd".
 
-## Data Combining and Analysis
+### Data Combining and Analysis
 The script offers functionality for:
 - **Combining all images into one dataframe**: Aggregating data from multiple CSV files into a single DataFrame for comprehensive analysis.
 - **Analyzing one image at a time**: Focusing on data from a single image for detailed analysis.
 
-## Plot Descriptions and Instructions
+### Plot Descriptions and Instructions
 
-### Three Concentric Rings Plot
+## Three Concentric Rings Plot
 - **Description**: Visualizes the proportion of different cellular markers within three concentric rings around each cell type, with each ring representing a specific radius.
 - **Instructions**:
   - Prepare data including measurements for each cell type.
@@ -99,38 +106,64 @@ The script offers functionality for:
 <img  src = "https://github.com/avinashpittu/Methods/assets/168061558/ef0b40e8-17db-4eee-9b56-4df08ca805a3" alt = "Concentric Rings" width = "382"/>
 
 
-### Cell Grid Plot
+## Cell Grid Plot
 - **Description**: Shows the spatial arrangement of cells on a grid based on their coordinates within a tissue sample, ideal for a single image analysis.
 - **Instructions**:
   - Ensure data includes coordinates and cell type markers.
   - Run the relevant code section for generating the cell grid plot.
   - Adjust visualization parameters to enhance clarity and insight.
 
-### C+ Cell Count Bar Graph
+## C+ Cell Count Bar Graph
 - **Description**: Displays counts of C+ and C- cells across different cell types using a bar graph.
 - **Instructions**:
   - Confirm that data columns correctly indicate C+ status.
   - Execute the bar graph plotting code provided in the R Markdown.
   - Modify the bar colors and labels to ensure readability.
 
-### Distance to Closest Cell Control Plot
+## Distance to Closest Cell Control Plot
 - **Description**: Evaluates the minimum distance from each macrophage to the closest cell, highlighting macrophage isolation or clustering.
 - **Instructions**:
   - Data must include `x` and `y` coordinates and cell types.
   - Calculate distances and generate the plot using the plotting code.
   - Customize the plot to reflect the specific characteristics of your analysis.
 
-### Opposite Average Distance Plot
+## Opposite Average Distance Plot
 - **Description**: Calculates and visualizes the average distance of the closest cells of type B from every cell of types A or D.
 - **Instructions**:
   - Prepare data with necessary coordinates and cell types.
   - Run the average distance calculation and visualization code.
   - Choose appropriate colors and adjust labels for clear data presentation.
 
-## Output
+### Output
 The outputs include various plots and visualizations that provide insights into cellular interactions and spatial distributions within the tissue sample. Each plot helps in understanding different aspects of the cellular environment, aiding in scientific analysis and research dissemination.
 
-# Running the Test Data
-Within both Data Analysis.Rmd and Plot Maker.Rmd, the variables that are required to be input by the user are pre-set for the test data. The user must download PDAC_measurements.csv from the Input folder, then direct the inputFolder path within Data Analysis.Rmd to the location where the Excel document is saved. The outputFolder variable must also be changed to the path of the folder where the output Excel files will be deposited. The inputFolder variable must be changed in Plot Maker.Rmd to the path of the folder where the output from Data Analysis.Rmd was deposited. The outputFolder in Plot Maker.Rmd will should be the path the a folder where the images of the data visualizations will be deposited.
+### Running the Test Data
+
+Within both `Data Analysis.Rmd` and `Plot Maker.Rmd`, the variables required for user input are pre-set for the test data. Follow these steps to run the test data:
+
+1. **Download Test Data**:
+   - Download `PDAC_measurements.csv` from the Input folder.
+
+2. **Data Analysis Setup**:
+   - Direct the `inputFolder` path within `Data Analysis.Rmd` to the location where `PDAC_measurements.csv` is saved:
+     ```r
+     inputFolder <- "path/to/your/input/folder"
+     ```
+   - Change the `outputFolder` variable to the path where the output Excel files will be deposited:
+     ```r
+     outputFolder <- "path/to/your/output/folder"
+     ```
+
+3. **Plot Maker Setup**:
+   - Set the `inputFolder` variable in `Plot Maker.Rmd` to the path where the output from `Data Analysis.Rmd` was saved:
+     ```r
+     inputFolder <- "path/to/data/analysis/output"
+     ```
+   - Set the `outputFolder` variable in `Plot Maker.Rmd` to the path where the images of the data visualizations will be deposited:
+     ```r
+     outputFolder <- "path/to/your/plot/output/folder"
+     ```
+   
+Ensure that these paths are correctly set in both R Markdown files before running the analysis and generating plots.
 
 ---
