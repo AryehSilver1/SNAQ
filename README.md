@@ -1,6 +1,6 @@
-## SNAQ: Spatial Neighborhood Analysis of QuPath
+# SNAQ: Spatial Neighborhood Analysis of QuPath
 
-### Introduction
+## Introduction
 SNAQ provides tools for analyzing immunohistochemically stained tissue samples at the single-cell level, focusing on spatial patterns and cellular interactions.
 
 ### Table of Contents
