@@ -11,9 +11,6 @@ SNAQ provides tools for analyzing immunohistochemically stained tissue samples a
 5. [Configuration](#configuration)
 6. [Running the Analysis](#running-the-analysis)
 7. [Output](#output)
-8. [Example Outputs](#example-outputs)
-9. [README 1: Template Data Analysis](#readme-1-template-data-analysis)
-10. [README 2: Plotting Functions](#readme-2-plotting-functions)
 
 ### README For Image Acquisition
 
