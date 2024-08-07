@@ -48,7 +48,7 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
    ```
 3. Run the script by knitting the document in RStudio.
 
-### Output
+## Output
 - The output will be generated in the specified output directory and will include Neighbourhood analysis results based on the defined parameters.
 
 
@@ -114,5 +114,7 @@ The script offers functionality for:
 ## Output
 The outputs include various plots and visualizations that provide insights into cellular interactions and spatial distributions within the tissue sample. Each plot helps in understanding different aspects of the cellular environment, aiding in scientific analysis and research dissemination.
 
+# Running the Test Data
+Within both Data Analysis.Rmd and Plot Maker.Rmd, the variables that are required to be input by the user are pre-set for the test data. The user must download PDAC_measurements.csv from the Input folder, then direct the inputFolder path within Data Analysis.Rmd to the location where the Excel document is saved. The outputFolder variable must also be changed to the path of the folder where the output Excel files will be deposited. The inputFolder variable must be changed in Plot Maker.Rmd to the path of the folder where the output from Data Analysis.Rmd was deposited. The outputFolder in Plot Maker.Rmd will should be the path the a folder where the images of the data visualizations will be deposited.
 
 ---
