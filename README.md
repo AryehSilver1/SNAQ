@@ -1,5 +1,17 @@
+## SNAQ: Spatial Neighborhood Analysis of QuPath
 
-## README For Image Acquisition
+### Introduction
+SNAQ provides tools for analyzing immunohistochemically stained tissue samples at the single-cell level, focusing on spatial patterns and cellular interactions.
+
+### Table of Contents
+1. [Description](#description)
+2. [Background](#background)
+3. [Methods](#methods)
+4. [Setup](#setup)
+5. [Configuration](#configuration)
+6. [Running the Analysis](#running-the-analysis)
+7. [Output](#output)
+8. [Example Outputs](#example-outputs)
 
 ### Description
 The R Markdown document titled "Template Data Analysis" automates the analysis of immunohistochemically stained tissue samples at the single-cell level using RStudio. The primary focus is on neighborhood analysis of cellular interactions within fluorescently-stained samples. The methodology integrates image processing, cellular classification, and geospatial analysis to identify and visualize spatial patterns of different cell types and their proliferation markers.
