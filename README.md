@@ -21,7 +21,7 @@ SNAQ provides tools for analyzing immunohistochemically stained tissue samples a
    
 
 ### Description
-The R Markdown document titled "Template Data Analysis" automates the analysis of immunohistochemically stained tissue samples at the single-cell level using RStudio. The primary focus is on neighborhood analysis of cellular interactions within fluorescently-stained samples. The methodology integrates image processing, cellular classification, and geospatial analysis to identify and visualize spatial patterns of different cell types and their proliferation markers.
+The R Markdown document titled "Template Data Analysis" automates the analysis of immunohistochemically stained tissue samples at the single-cell level using RStudio. The primary focus is on neighborhood analysis of cellular interactions within fluorescently stained samples. The methodology integrates image processing, cellular classification, and geospatial analysis to identify and visualize spatial patterns of different cell types and their proliferation markers.
 
 ### Background
 Analyzing the local microenvironment around tumor cells can provide crucial insights into the interactions between tumor and immune cells. This document provides a framework to quantify these interactions by analyzing the distances between cell types within specified radii and visualizing these relationships.
@@ -32,7 +32,7 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
 3. **R Analysis**: The R script processes image data in bulk to analyze the neighborhood relationships between cells using distances calculated from their coordinates.
 
 
-The repository includes two detailed README files that explain the usage of two R scripts: `Data Analysis.Rmd` and `Plot Maker.Rmd`. Each README provides comprehensive instructions on setup, configuration, running the analysis, and understanding the outputs. Below are the detailed sections for each script, ensuring a clear and efficient workflow for users.
+Below is a detailed explanation of the usage of two R scripts: `Data Analysis.Rmd` and `Plot Maker.Rmd`. Each README provides comprehensive instructions on setup, configuration, running the analysis, and understanding the outputs, ensuring a clear and efficient workflow for users.
 
 
 ## README For "Data Analysis.Rmd"
@@ -61,7 +61,7 @@ The repository includes two detailed README files that explain the usage of two 
 - **Marker C**: Represents a modifier marker that can modify Marker B.
 
 ## Marker Interactions
-- **Marker C modifies Marker B**: Only Marker C has the ability to modify Marker B. This interaction is a key aspect of the analysis.
+- **Marker C modifies Marker B**: Only Marker C can modify Marker B. This interaction is a key aspect of the analysis.
 
 ### Running the Analysis
 1. Load the R Markdown file in RStudio.
@@ -91,7 +91,7 @@ Variables such as `dist1`, `dist2`, `dist3` (distances for measurement rings), `
 
 ### Data Combining and Analysis
 The script offers functionality for:
-- **Combining all images into one dataframe**: Aggregating data from multiple CSV files into a single DataFrame for comprehensive analysis.
+- **Combining all images into one dataframe**: Aggregating data from multiple CSV files into a single data frame for comprehensive analysis.
 - **Analyzing one image at a time**: Focusing on data from a single image for detailed analysis.
 
 ### Plot Descriptions and Instructions
@@ -121,7 +121,7 @@ The script offers functionality for:
   - Modify the bar colors and labels to ensure readability.
 
 ## Distance to Closest Cell Control Plot
-- **Description**: Evaluates the minimum distance from each macrophage to the closest cell, highlighting macrophage isolation or clustering.
+- **Description**: Evaluate the minimum distance from each macrophage to the closest cell, highlighting macrophage isolation or clustering.
 - **Instructions**:
   - Data must include `x` and `y` coordinates and cell types.
   - Calculate distances and generate the plot using the plotting code.
