@@ -21,7 +21,7 @@ SNAQ provides tools for analyzing immunohistochemically stained tissue samples a
    
 
 ## Description
-The R Markdown documents titled "Data Analysis.Rmd" and "Plot Maker.Rmd" automate the analysis of immunohistochemically stained tissue samples at the single-cell level using RStudio. The primary focus is on neighborhood analysis of cellular interactions within fluorescently stained samples. The methodology integrates image processing, cellular classification, and geospatial analysis to identify and visualize spatial patterns of different cell types.
+The R Markdown documents titled `Data Analysis.Rmd` and `Plot Maker.Rmd` automate the analysis of immunohistochemically stained tissue samples at the single-cell level using RStudio. The primary focus is on neighborhood analysis of cellular interactions within fluorescently stained samples. The methodology integrates image processing, cellular classification, and geospatial analysis to identify and visualize spatial patterns of different cell types.
 
 ## Background
 Analyzing the local microenvironment around tumor cells can provide crucial insights into the interactions between tumor and immune cells. This document provides a framework to quantify these interactions by analyzing the distances between cell types within specified radii and visualizing these relationships.
@@ -35,7 +35,7 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
 #### Below is a detailed explanation of the usage of two R scripts: `Data Analysis.Rmd` and `Plot Maker.Rmd`. Each README provides comprehensive instructions on setup, configuration, running the analysis, and understanding the outputs, ensuring a clear and efficient workflow for users.
 
 
-## README For "Data Analysis.Rmd"
+## README For `Data Analysis.Rmd`
 
 ## Setup
 1. **Install R and RStudio**: Ensure you have R and RStudio installed on your system. You can download them from [CRAN](https://cran.r-project.org) and [RStudio's website](https://rstudio.com/products/rstudio/download/), respectively.
@@ -77,7 +77,7 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
 
 
 
-## README for "Plot Maker.Rmd"
+## README for `Plot Maker.Rmd`
 
 **Install Required Packages**: Open RStudio and install the required libraries by running:
    ```R
