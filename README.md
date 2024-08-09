@@ -18,6 +18,7 @@ SNAQ provides tools for analyzing immunohistochemically stained tissue samples a
    - [Plot Descriptions and Instructions](#Plot-Descriptions-and-Instructions)
    - [Output](#output)
 6. [Running the Test Data](#running-the-test-data)
+7. [Acknowledgements](#Acknowledgements)
    
 
 ## Description
@@ -165,5 +166,14 @@ Within both `Data Analysis.Rmd` and `Plot Maker.Rmd`, the variables required for
      ```
    
 Ensure that these paths are correctly set in both R Markdown files before running the analysis and generating plots.
+
+### Acknowledgements
+We would like to extend our gratitude to the following individuals and organizations for their support and contributions to this project:
+
+- **Professor Dr. Loic Deleyrolle** - For guidance and supervision.
+- **Dr. Avirup Chakraborty** - For valuable insights.
+- **Avinash Pittu** - As a fellow developer in the development process.
+- **University of Florida** - For providing resources and support.
+
 
 ---
