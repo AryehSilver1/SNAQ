@@ -183,7 +183,8 @@ We would like to extend our gratitude to the following individuals and organizat
 
 - **Professor Dr. Loic Deleyrolle** - For guidance and supervision.
 - **Dr. Avirup Chakraborty** - For valuable insights.
-- **Avinash Pittu** - As a fellow developer in the development process.
+- **Aryeh Silver** - As a developer in the development process.
+- **Avinash Pittu** - As a developer in the development process.
 - **University of Florida** - For providing resources and support.
 
 
