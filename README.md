@@ -147,21 +147,21 @@ Within both `Data Analysis.Rmd` and `Plot Maker.Rmd`, the variables required for
 2. **Data Analysis Setup**:
    - Direct the `inputFolder` path within `Data Analysis.Rmd` to the location where `PDAC_measurements.csv` is saved:
      ```r
-     inputFolder <- "path/to/your/input/folder"
+     inputFolder = "path/to/your/input/folder"
      ```
    - Change the `outputFolder` variable to the path where the output Excel files will be deposited:
      ```r
-     outputFolder <- "path/to/your/output/folder"
+     outputFolder = "path/to/your/output/folder"
      ```
 
 3. **Plot Maker Setup**:
    - Set the `inputFolder` variable in `Plot Maker.Rmd` to the path where the output from `Data Analysis.Rmd` was saved:
      ```r
-     inputFolder <- "path/to/data/analysis/output"
+     inputFolder = "path/to/data/analysis/output"
      ```
    - Set the `outputFolder` variable in `Plot Maker.Rmd` to the path where the images of the data visualizations will be deposited:
      ```r
-     outputFolder <- "path/to/your/plot/output/folder"
+     outputFolder = "path/to/your/plot/output/folder"
      ```
    
 Ensure that these paths are correctly set in both R Markdown files before running the analysis and generating plots.
