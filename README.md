@@ -22,10 +22,11 @@ SNAQ provides tools for analyzing immunohistochemically stained tissue samples a
    
 
 ## Description
-The R Markdown documents titled `Data Analysis.Rmd` and `Plot Maker.Rmd` automate the analysis of immunohistochemically stained tissue samples at the single-cell level using RStudio. The primary focus is on neighborhood analysis of cellular interactions within fluorescently stained samples. The methodology integrates image processing, cellular classification, and geospatial analysis to identify and visualize spatial patterns of different cell types.
+The R Markdown documents titled `Data Analysis.Rmd` and `Plot Maker.Rmd` automate the analysis of immunohistochemically stained tissue samples at the single-cell level using RStudio. The primary focus is on neighborhood analysis of cellular interactions within fluorescently stained samples. This methodology integrates image processing, cellular classification, and geospatial analysis to identify and visualize spatial patterns of different cell types. By automating these processes, SNAQ aims to provide a streamlined and reproducible workflow for researchers studying complex cellular environments.
 
 ## Background
-Analyzing the local microenvironment around tumor cells can provide crucial insights into the interactions between tumor and immune cells. This document provides a framework to quantify these interactions by analyzing the distances between cell types within specified radii and visualizing these relationships.
+Analyzing the local microenvironment around tumor cells can provide crucial insights into the interactions between tumor and immune cells. Understanding these interactions is vital for advancing cancer research and developing effective treatments. This document provides a framework to quantify these interactions by analyzing the distances between cell types within specified radii and visualizing these relationships. By examining the spatial distribution and proximity of various cell types, researchers can gain a better understanding of the cellular microenvironment and its role in tumor progression and immune response. This approach helps in identifying patterns and potential therapeutic targets within the tumor microenvironment.
+
 
 ## Methods
 1. **Image Acquisition**: Fluorescent images are acquired using a fluorescent microscope.
@@ -135,8 +136,16 @@ The script offers functionality for:
   - Run the average distance calculation and visualization code.
   - Choose appropriate colors and adjust labels for clear data presentation.
 
-## Output
-The outputs include various plots and visualizations that provide insights into cellular interactions and spatial distributions within the tissue sample. Each plot helps in understanding different aspects of the cellular environment, aiding in scientific analysis and research dissemination.
+### Output
+The outputs include various plots and visualizations that provide insights into cellular interactions and spatial distributions within the tissue sample. These visualizations help in understanding different aspects of the cellular environment, aiding in scientific analysis and research dissemination. The types of plots generated include:
+
+1. **Three Concentric Rings Plot**: Visualizes the proportion of different cellular markers within three concentric rings around each cell type.
+2. **Cell Grid Plot**: Shows the spatial arrangement of cells on a grid based on their coordinates within a tissue sample.
+3. **C+ Cell Count Bar Graph**: Displays counts of C+ and C- cells across different cell types using a bar graph.
+4. **Distance to Closest Cell Control Plot**: Evaluates the minimum distance from each macrophage to the closest cell, highlighting macrophage isolation or clustering.
+5. **Opposite Average Distance Plot**: Calculates and visualizes the average distance of the closest cells of type B from every cell of types A or D.
+
+These plots provide comprehensive insights into the spatial patterns and interactions of different cell types, facilitating a deeper understanding of the cellular microenvironment.
 
 ## Running the Test Data
 
