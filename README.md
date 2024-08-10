@@ -76,7 +76,7 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
 3. Run the script by knitting the document in RStudio.
 
 ### Output
-- The output will be generated in the specified output directory and will include Neighborhood analysis results based on the defined parameters.
+- The output will be generated in the specified output directory and will include Neighborhood analysis results based on the defined parameters. The output consists of numerous Excel files that will be stored in the designated output folder. These files will not make any sense until they are visualized with `Plot Maker.Rmd`.
 
 ### Note
 In `Data Analysis.Rmd`, the input data is taken from QuPath by exporting the x, y locations and necessary parameters. Ensure that the data exported from QuPath is correctly formatted and includes all required parameters for accurate analysis. The exported data should match the `PDAC_measurements.csv` format in the input folder.
