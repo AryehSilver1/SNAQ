@@ -183,10 +183,10 @@ Ensure that these paths are correctly set in both R Markdown files before runnin
 ### Acknowledgements
 We would like to extend our gratitude to the following individuals and organizations for their support and contributions to this project:
 
-- **Professor Dr. Loic Deleyrolle** - For guidance and supervision.
+- **Dr. Loic Deleyrolle** - For guidance and supervision.
 - **Dr. Avirup Chakraborty** - For valuable insights.
-- **Aryeh Silver** - As a developer in the development process.
-- **Avinash Pittu** - As a developer in the development process.
+- **Aryeh Silver** - For essential contributions as a developer.
+- **Avinash Pittu** - For essential contributions as a developer.
 - **University of Florida** - For providing resources and support.
 
 
