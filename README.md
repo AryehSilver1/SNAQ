@@ -34,12 +34,16 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
 3. **R Analysis**: The R script processes image data in bulk to analyze the neighborhood relationships between cells using distances calculated from their coordinates.
 
 
- Below is a detailed explanation of the usage of two R scripts: `Data Analysis.Rmd` and `Plot Maker.Rmd`. Each README provides comprehensive instructions on setup, configuration, running the analysis, and understanding the outputs, ensuring a clear and efficient workflow for users. 
- 
- <b> NOTE: `Data Analysis.Rmd` must be run before `Plot Maker.Rmd`. The former processes the raw data from QuPath and the latter creates visualizations from the output of `Data Analysis.Rmd`. </b>
+## Running the Analysis
+
+### Obtaining Input Data
+
+To begin the analysis, you need to obtain the input data from QuPath. This involves:
+
+- **Exporting Measurements**: Use QuPath to export the cellular measurements as CSV files. Ensure that the data includes all required parameters for accurate analysis.
 
 
-## README For `Data Analysis.Rmd`
+### Running `Data Analysis.Rmd`
 
 ## Setup
 1. **Install R and RStudio**: Ensure you have R and RStudio installed on your system. You can download them from [CRAN](https://cran.r-project.org) and [RStudio's website](https://rstudio.com/products/rstudio/download/), respectively.
@@ -76,14 +80,15 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
 3. Run the script by knitting the document in RStudio.
 
 ### Output
-- The output will be generated in the specified output directory and will include Neighborhood analysis results based on the defined parameters. The output consists of numerous Excel files that will be stored in the designated output folder. These files will not make any sense until they are visualized with `Plot Maker.Rmd`.
+- The output will be generated in the specified output directory and will include Neighborhood analysis results based on the defined parameters. The output consists of numerous Excel files that will be stored in the designated output folder.
+- The output will be generated in the specified output directory, consisting of neighborhood analysis results. These files will be used for plotting in the next step.
 
 ### Note
 In `Data Analysis.Rmd`, the input data is taken from QuPath by exporting the x, y locations and necessary parameters. Ensure that the data exported from QuPath is correctly formatted and includes all required parameters for accurate analysis. The exported data should match the `PDAC_measurements.csv` format in the input folder.
 
 
 
-## README for `Plot Maker.Rmd`
+## Generating Plots with `Plot Maker.Rmd`
 
 **Install Required Packages**: Open RStudio and install the required libraries by running:
    ```R
