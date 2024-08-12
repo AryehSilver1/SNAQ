@@ -12,7 +12,7 @@ SNAQ provides tools for analyzing immunohistochemically stained tissue samples a
    - [Configuration](#configuration)
    - [Running the Analysis](#running-the-analysis)
    - [Output](#output)
-5. [Generating Plots with `Plot Maker.Rmd`](#generating-plots-with-Plot-maker-rmd)
+5. [Generating Plots with `Plot Maker.Rmd`](#generating-plots-with-Plot-makerrmd)
    - [Data Initialization](#Data-Initialization)
    - [Data Combining and Analysis](#Data-Combining-and-Analysis)
    - [Plot Descriptions and Instructions](#Plot-Descriptions-and-Instructions)
