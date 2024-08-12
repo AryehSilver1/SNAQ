@@ -40,7 +40,7 @@ Analyzing the local microenvironment around tumor cells can provide crucial insi
 
 To begin the analysis, you need to obtain the input data from QuPath. This involves:
 
-- **Exporting Measurements**: Use QuPath to export the cellular measurements as CSV files. Ensure that the data includes all required parameters for accurate analysis.
+- **Exporting Measurements**: Use QuPath to export the cellular measurements as CSV files. Ensure that the data includes all required parameters for accurate analysis. Ensure that the data exported from QuPath is correctly formatted and includes all required parameters for accurate analysis. The exported data should match the `PDAC_measurements.csv` format in the input folder.
 
 
 ### Running `Data Analysis.Rmd`
@@ -82,10 +82,6 @@ To begin the analysis, you need to obtain the input data from QuPath. This invol
 ### Output
 - The output will be generated in the specified output directory and will include Neighborhood analysis results based on the defined parameters. The output consists of numerous Excel files that will be stored in the designated output folder.
 - The output will be generated in the specified output directory, consisting of neighborhood analysis results. These files will be used for plotting in the next step.
-
-### Note
-In `Data Analysis.Rmd`, the input data is taken from QuPath by exporting the x, y locations and necessary parameters. Ensure that the data exported from QuPath is correctly formatted and includes all required parameters for accurate analysis. The exported data should match the `PDAC_measurements.csv` format in the input folder.
-
 
 
 ## Generating Plots with `Plot Maker.Rmd`
