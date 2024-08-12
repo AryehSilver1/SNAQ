@@ -81,7 +81,7 @@ To begin the analysis, you need to obtain the input data from QuPath. This invol
 
 ### Output
 - The output will be generated in the specified output directory and will include Neighborhood analysis results based on the defined parameters. The output consists of numerous Excel files that will be stored in the designated output folder.
-- The output will be generated in the specified output directory, consisting of neighborhood analysis results. These files will be used for plotting in the next step.
+- These files will be used for plotting in the next step (as a input files to the `Plot Marker.rmd`)
 
 
 ## Generating Plots with `Plot Maker.Rmd`
