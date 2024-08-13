@@ -43,7 +43,7 @@ To begin the analysis, you need to obtain the input data from QuPath. This invol
 - **Exporting Measurements**: Use QuPath to export the cellular measurements as CSV files. Ensure that the data includes all required parameters for accurate analysis. Ensure that the data exported from QuPath is correctly formatted and includes all required parameters for accurate analysis. The exported data should match the `PDAC_measurements.csv` format in the input folder.
 
 
-### Running `Data Analysis.Rmd`
+## Running `Data Analysis.Rmd`
 
 ## Setup
 1. **Install R and RStudio**: Ensure you have R and RStudio installed on your system. You can download them from [CRAN](https://cran.r-project.org) and [RStudio's website](https://rstudio.com/products/rstudio/download/), respectively.
