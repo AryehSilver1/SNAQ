@@ -20,7 +20,7 @@ library(doParallel)
 Variables to Initialize
 ```{r, include = FALSE}
 
-#variables to input by the user
+#variables to input by the user  
 
 dist1 = 15 #um - distance away from cell's center for the first ring
 dist2 = 35 #um - distance away from cell's center for the second ring

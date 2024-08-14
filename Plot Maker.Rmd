@@ -18,7 +18,7 @@ library(data.table)
 library(ggthemes)
 ```
 
-Variables to Initialize
+Variables to Initialize  
 ```{r}
 
 #variables to input by the user
