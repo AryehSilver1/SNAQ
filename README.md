@@ -154,7 +154,7 @@ These plots provide comprehensive insights into the spatial patterns and interac
 
 ## Running the Test Data
 
-Within both `Data Analysis.Rmd` and `Plot Maker.Rmd`, the variables required for user input are pre-set for the test data. Follow these steps to run the test data:
+Within both `Data Analysis.Rmd` and `Plot Maker.Rmd`, the variables required for user input are pre-set for the PDAC dataset. Follow these steps to run the test data:
 
 1. **Download Test Data**:
    - Download `PDAC_measurements.csv` from the Input folder.
