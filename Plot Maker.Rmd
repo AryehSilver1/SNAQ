@@ -36,12 +36,9 @@ markerB = "CD68"
 markerC = "PD-L1"
 markerD = "Neither"
 
-workingDir = "C:/Users/arisi/UFL Dropbox/Aryeh Silver/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/1.CSBJ/Revisions (Submission 2)/code/Code_final_for_Ari/Output" #folder with output of Data Analysis
+workingDir = "Path to the folder with output CSV files (make sure to use backwards slashes)"
 
-graphOutputPath = "C:/Users/arisi/UFL Dropbox/Aryeh Silver/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/1.CSBJ/Revisions (Submission 2)/code/Code_final_for_Ari/Graphs" #folder where you want to save the graphs
-
-#workingDir = "" #Path to the folder with output CSV files (make sure to use backwards slashes)
-#graphOutputPath = "" #Path to the folder where you want to save the graphs
+graphOutputPath = "Path to the folder where you want to save the graphs (make sure to use backwards slashes)" 
 
 ```
 

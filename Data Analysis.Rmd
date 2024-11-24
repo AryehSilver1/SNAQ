@@ -36,12 +36,10 @@ markerB = "CD68"
 markerC = "PD-L1"
 #initialize additional marker names here
 
-inputFolder = "C:/Users/arisi/Dropbox (UFL)/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/PDAC Images/Input"
+inputFolder = "put the Path to the input folder (make sure to use backwards slashes)"
 
-outputFolder = "C:/Users/arisi/UFL Dropbox/Aryeh Silver/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/1.CSBJ/Revisions (Submission 2)/code/Code_final_for_Ari/Output"
+outputFolder = "put the Path to the output folder (make sure to use backwards slashes)"
 
-#inputFolder = "" #put the Path to the input folder (make sure to use backwards slashes)
-#outputFolder = "" #put the Path to the output folder (make sure to use backwards slashes)
 
 ```
 
