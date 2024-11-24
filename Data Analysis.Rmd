@@ -15,6 +15,7 @@ library(tidyverse)
 library(data.table)
 library(foreach)
 library(doParallel)
+library(fields)
 ```
 
 Variables to Initialize
@@ -33,10 +34,11 @@ numImages = 8 #total number of images
 markerA = "PanCK"
 markerB = "CD68"
 markerC = "PD-L1"
+#initialize additional marker names here
 
 inputFolder = "C:/Users/arisi/Dropbox (UFL)/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/PDAC Images/Input"
 
-outputFolder = "C:/Users/arisi/Dropbox (UFL)/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/PDAC Images/Output"
+outputFolder = "C:/Users/arisi/UFL Dropbox/Aryeh Silver/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/1.CSBJ/Revisions (Submission 2)/code/Code_final_for_Ari/Output"
 
 #inputFolder = "" #put the Path to the input folder (make sure to use backwards slashes)
 #outputFolder = "" #put the Path to the output folder (make sure to use backwards slashes)
@@ -69,7 +71,6 @@ ROI7centroidX = 5706.95
 ROI7centroidY = 16916.2
 ROI8centroidX = 9660.9
 ROI8centroidY = 8966.7
-
 #end of variables to initialize
 ############################################
 
@@ -93,7 +94,10 @@ for (i in 1:numImages) {
       xDim = xDim - (get(centroidX) - (maxXum / 2)),
       yDim = yDim - (get(centroidY) - (maxYum / 2))
     )
+  newDataFrame = newDataFrame %>%
+    mutate(Classification = ifelse(is.na(Classification), "Neither", Classification))
   assign(dataFrameName, newDataFrame)
+  
   
   # exports each dataframe back into input folder
   dir = paste0(inputFolder, "/MeasurementsData", as.character(i), ".csv")
@@ -141,40 +145,39 @@ for (a in 1:numImages) {
   imageNumber = a
   
   newCombo = combo[combo$ImageNumber == imageNumber, ]
-
-  numCores = makeCluster(detectCores() - 1) #subtract more than 1 to use less cores if desired
-  registerDoParallel(numCores)
   
+  numCores = makeCluster(detectCores() - 1) #subtract more than 1  to use less cores if desired
+  registerDoParallel(numCores)
   nums = sum(count(newCombo))
   
-  # euclidean distance function
-  calcDist = function(cell1, cell2) {
-    sqrt((cell1$xDim - cell2$xDim)^2 + (cell1$yDim - cell2$yDim)^2)
-  }
+  coords = newCombo %>%
+    select(xDim, yDim) %>%
+    as.matrix()
   
-  #distance matrix with *parallelization*
-  distances = foreach(i = 1:nums, .combine = "c") %dopar% {
-    if (newCombo[[i, "xDim"]] <= (maxXum - maxDist) && newCombo[[i, "xDim"]] >= maxDist && newCombo[[i, "yDim"]] <= (maxYum - maxDist) && newCombo[[i, "yDim"]] >= maxDist) {
-      dist = numeric(nums) #list of numbers of length nums that is populated by the for loop below it
-      for (j in 1:nums) {
-      dist[j] = calcDist(newCombo[i, ], newCombo[j, ])
-      }
-    }
+  # Calculate all pairwise distances once
+  distances_full = rdist(coords)  
+
+  # Apply the boundary condition with parallel processing
+  distances = foreach(i = 1:nrow(coords), .combine = "c") %dopar% {
+    if (newCombo[[i, "xDim"]] <= (maxXum - maxDist) && 
+        newCombo[[i, "xDim"]] >= maxDist && 
+        newCombo[[i, "yDim"]] <= (maxYum - maxDist) && 
+        newCombo[[i, "yDim"]] >= maxDist) 
+      {
+      dist = distances_full[i, ]  # Use precomputed distance for valid points
+      } 
     else {
-      dist = rep(NA, nums) #list of NAs
+      dist = rep(NA, nrow(coords))  # Set to NA if outside boundary
+      }
+    dist  # Return the computed or NA-filled distances for each i
     }
-    dist #returns this value
-  }
-  
-  distances = matrix(distances, nrow = nums, byrow = TRUE)
-  
-  
-  #exporting distance matrix to CSV
-  dir = paste0(outputFolder, "/distanceMatrix", as.character(imageNumber), ".csv")
-  write.csv(distances, dir, row.names = TRUE)
+
+  # Reshape distances to a matrix after foreach
+  distances = matrix(distances, nrow = nrow(coords), byrow = TRUE)
   
   
   #Finding number of neighbors within specified distance
+  #To add additional markers, continue the pattern for each section
   #initializing the TOTAL counting variables 
   newCombo$NumBNeighbors = 0
   newCombo$NumANeighbors = 0
@@ -201,10 +204,11 @@ for (a in 1:numImages) {
   newCombo$NumB.CNeighbors3 = 0
   
   # Dynamic programming to find num of neighbors
+  # To add additional markers, add a new if statement for each ring to create a tally for the number of times the marker appears within each ring
   for (cell in 1:nums) {
     for (neighbor in 1:nums) {
-      if (cell != neighbor && !is.na(distances[[cell, neighbor]])) {
-        distance = distances[[cell, neighbor]]
+      if (cell != neighbor && !is.na(distances[cell, neighbor])) {
+        distance = distances[cell, neighbor]
         #TOTAL neighbors
         if (distance <= maxDist) {
           if (newCombo[[neighbor, "identity"]] == 0) {
@@ -281,7 +285,8 @@ for (a in 1:numImages) {
     }
   }
   
-  #Finds proportions of number of neighbors for each ring
+  # Finds proportions of number of neighbors for each ring
+  # To add additional markers, initialize a new variable for each ring for each new marker
   newCombo = newCombo %>%
     mutate(
     #TOTAL
@@ -341,13 +346,10 @@ for (a in 1:numImages) {
   # Exporting newCombo as CSV  
   dir = paste0(outputFolder, "/newCombo", as.character(imageNumber), ".csv")
   write.csv(newCombo, dir, row.names = FALSE)
-  
-  
-  
-  
-  
-  
+
+
   # Making the short data tables for the distances analyses
+  # To add additional markers, create a new short data table for each additional marker to aid in the nearest neighbor calculations
   B = newCombo[newCombo$identityCat == "B", ]
   numsB = sum(count(B))  # gets number of B cells
   
@@ -359,9 +361,8 @@ for (a in 1:numImages) {
   
   D = newCombo[newCombo$identityCat == "D", ]
   numsD = sum(count(D))  # gets number of D cells
-  
-  
-  # Finds the average distance of the closest A from each B ****************************************************************************
+
+# Finds the average distance of the closest A from each B ****************************************************************************
   
   distToClosestA = foreach(i = 1:numsB, .combine = "c") %dopar% {
     minDist = sqrt(maxXum^2 + maxYum^2)
@@ -370,8 +371,8 @@ for (a in 1:numImages) {
       for (j in 1:nums) {
         if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
           if ((newCombo[[j, "identityCat"]] == "A") && (x != j)) {
-            if (distances[[x, j]] < minDist) {
-              minDist = distances[[x, j]]
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
             }
           }
         }
@@ -398,8 +399,8 @@ for (a in 1:numImages) {
       for (j in 1:nums) {
         if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
           if ((newCombo[[j, "identityCat"]] == "D") && (x != j)) {
-            if (distances[[x, j]] < minDist) {
-              minDist = distances[[x, j]]
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
             }
           }
         }
@@ -430,8 +431,8 @@ for (a in 1:numImages) {
       for (j in 1:nums) {
         if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
           if ((newCombo[[j, "identityCat"]] == "A") && (x != j)) {
-            if (distances[[x, j]] < minDist) {
-              minDist = distances[[x, j]]
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
             }
           }
         }
@@ -457,8 +458,8 @@ for (a in 1:numImages) {
       for (j in 1:nums) {
         if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
           if ((newCombo[[j, "identityCat"]] == "D") && (x != j)) {
-            if (distances[[x, j]] < minDist) {
-              minDist = distances[[x, j]]
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
             }
           }
         }
@@ -488,8 +489,8 @@ for (a in 1:numImages) {
       for (j in 1:nums) {
         if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
           if (x != j) {
-            if (distances[[x, j]] < minDist) {
-              minDist = distances[[x, j]]
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
             }
           }
         }
@@ -524,8 +525,8 @@ for (a in 1:numImages) {
       for (j in 1:nums) {
         if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
           if (x != j) {
-            if (distances[[x, j]] < minDist) {
-              minDist = distances[[x, j]]
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
             }
           }
         }
@@ -559,8 +560,8 @@ for (a in 1:numImages) {
       for (j in 1:nums) {
         if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
           if (x != j) {
-            if (distances[[x, j]] < minDist) {
-              minDist = distances[[x, j]]
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
             }
           }
         }
@@ -593,8 +594,8 @@ for (a in 1:numImages) {
       for (j in 1:nums) {
         if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
           if ((newCombo[[j, "identityCat"]] == "B") && (x != j)) {
-            if (distances[[x, j]] < minDist) {
-              minDist = distances[[x, j]]
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
             }
           }
         }
@@ -627,8 +628,8 @@ for (a in 1:numImages) {
       for (j in 1:nums) {
         if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
           if ((newCombo[[j, "identityCat"]] == "B") && (x != j)) {
-            if (distances[[x, j]] < minDist) {
-              minDist = distances[[x, j]]
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
             }
           }
         }
@@ -660,8 +661,8 @@ for (a in 1:numImages) {
       for (j in 1:nums) {
         if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
           if ((newCombo[[j, "identityCat"]] == "B") && (newCombo[[j, "identityC"]] == "C+") && (x != j)) {
-            if (distances[[x, j]] < minDist) {
-              minDist = distances[[x, j]]
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
             }
           }
         }
@@ -693,8 +694,8 @@ for (a in 1:numImages) {
       for (j in 1:nums) {
         if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
           if ((newCombo[[j, "identityCat"]] == "B") && (newCombo[[j, "identityC"]] == "C+") && (x != j)) {
-            if (distances[[x, j]] < minDist) {
-              minDist = distances[[x, j]]
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
             }
           }
         }
@@ -708,9 +709,6 @@ for (a in 1:numImages) {
   
   dir = paste0(outputFolder, "/OppDdistB.C", as.character(imageNumber), ".csv")
   write.csv(distToClosestB.C, dir, row.names = FALSE)
-  
-  
-  
   
     
   # OPPOSITE
@@ -777,5 +775,222 @@ for (a in 1:numImages) {
 end.time = Sys.time()
 time.taken = round(end.time - start.time, 3)
 time.taken
+```
+
+Additional closest neighbor calculations
+```{r}
+
+ # Finds the average distance of the closest A from each A ****************************************************************************
+  
+  distToClosestAA = foreach(i = 1:numsA, .combine = "c") %dopar% {
+    minDist = sqrt(maxXum^2 + maxYum^2)
+    x = A[[i, "CellNumber"]]
+    if (newCombo[[x, "xDim"]] <= (maxXum - maxDist) && newCombo[[x, "xDim"]] >= maxDist && newCombo[[x, "yDim"]] <= (maxYum - maxDist) && newCombo[[x, "yDim"]] >= maxDist) {
+      for (j in 1:nums) {
+        if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
+          if ((newCombo[[j, "identityCat"]] == "A") && (x != j)) {
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
+            }
+          }
+        }
+      }
+    }
+    else {
+      minDist = NA
+    }
+    minDist
+  }
+  
+  dir = paste0(outputFolder, "/distAA", as.character(imageNumber), ".csv")
+  write.csv(distToClosestAA, dir, row.names = FALSE)
+  
+  
+  
+  # Finds the average distance of the closest D from each A ****************************************************************************
+  
+  distToClosestDA = foreach(i = 1:numsA, .combine = "c") %dopar% {
+    minDist = sqrt(maxXum^2 + maxYum^2)
+    x = A[[i, "CellNumber"]]
+    if (newCombo[[x, "xDim"]] <= (maxXum - maxDist) && newCombo[[x, "xDim"]] >= maxDist && newCombo[[x, "yDim"]] <= (maxYum - maxDist) && newCombo[[x, "yDim"]] >= maxDist) {
+      for (j in 1:nums) {
+        if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
+          if ((newCombo[[j, "identityCat"]] == "D") && (x != j)) {
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
+            }
+          }
+        }
+      }
+    }
+    else {
+      minDist = NA
+    }
+    minDist
+  }
+  
+  dir = paste0(outputFolder, "/distDA", as.character(imageNumber), ".csv")
+  write.csv(distToClosestDA, dir, row.names = FALSE)
+  
+  
+  # Finds the average distance of the closest B from each B ****************************************************************************
+  
+  distToClosestBB = foreach(i = 1:numsB, .combine = "c") %dopar% {
+    minDist = sqrt(maxXum^2 + maxYum^2)
+    x = B[[i, "CellNumber"]]
+    if (newCombo[[x, "xDim"]] <= (maxXum - maxDist) && newCombo[[x, "xDim"]] >= maxDist && newCombo[[x, "yDim"]] <= (maxYum - maxDist) && newCombo[[x, "yDim"]] >= maxDist) {
+      for (j in 1:nums) {
+        if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
+          if ((newCombo[[j, "identityCat"]] == "B") && (x != j)) {
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
+            }
+          }
+        }
+      }
+    }
+    else {
+      minDist = NA
+    }
+    minDist
+  }
+  
+  dir = paste0(outputFolder, "/distBB", as.character(imageNumber), ".csv")
+  write.csv(distToClosestBB, dir, row.names = FALSE)
+  
+  
+  
+  # Finds the average distance of the closest B.C from each B ****************************************************************************
+  
+  distToClosestBCB = foreach(i = 1:numsB, .combine = "c") %dopar% {
+    minDist = sqrt(maxXum^2 + maxYum^2)
+    x = B[[i, "CellNumber"]]
+    if (newCombo[[x, "xDim"]] <= (maxXum - maxDist) && newCombo[[x, "xDim"]] >= maxDist && newCombo[[x, "yDim"]] <= (maxYum - maxDist) && newCombo[[x, "yDim"]] >= maxDist) {
+      for (j in 1:nums) {
+        if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
+          if ((newCombo[[j, "identityCat"]] == "B") && (newCombo[[j, "identityC"]] == "C+") && (x != j)) {
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
+            }
+          }
+        }
+      }
+    }
+    else {
+      minDist = NA
+    }
+    minDist
+  }
+  
+  dir = paste0(outputFolder, "/distBCB", as.character(imageNumber), ".csv")
+  write.csv(distToClosestBCB, dir, row.names = FALSE)
+  
+  
+  
+  # Finds the average distance of the closest B from each B.C ****************************************************************************
+  
+  distToClosestBBC = foreach(i = 1:numsB.C, .combine = "c") %dopar% {
+    minDist = sqrt(maxXum^2 + maxYum^2)
+    x = B.C[[i, "CellNumber"]]
+    if (newCombo[[x, "xDim"]] <= (maxXum - maxDist) && newCombo[[x, "xDim"]] >= maxDist && newCombo[[x, "yDim"]] <= (maxYum - maxDist) && newCombo[[x, "yDim"]] >= maxDist) {
+      for (j in 1:nums) {
+        if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
+          if ((newCombo[[j, "identityCat"]] == "B") && (x != j)) {
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
+            }
+          }
+        }
+      }
+    }
+    else {
+      minDist = NA
+    }
+    minDist
+  }
+  
+  dir = paste0(outputFolder, "/distBBC", as.character(imageNumber), ".csv")
+  write.csv(distToClosestBBC, dir, row.names = FALSE)
+  
+  
+  
+  # Finds the average distance of the closest B.C from each B.C ****************************************************************************
+  
+  distToClosestBCBC = foreach(i = 1:numsB.C, .combine = "c") %dopar% {
+    minDist = sqrt(maxXum^2 + maxYum^2)
+    x = B.C[[i, "CellNumber"]]
+    if (newCombo[[x, "xDim"]] <= (maxXum - maxDist) && newCombo[[x, "xDim"]] >= maxDist && newCombo[[x, "yDim"]] <= (maxYum - maxDist) && newCombo[[x, "yDim"]] >= maxDist) {
+      for (j in 1:nums) {
+        if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
+          if ((newCombo[[j, "identityCat"]] == "B") && (newCombo[[j, "identityC"]] == "C+") && (x != j)) {
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
+            }
+          }
+        }
+      }
+    }
+    else {
+      minDist = NA
+    }
+    minDist
+  }
+  
+  dir = paste0(outputFolder, "/distBCBC", as.character(imageNumber), ".csv")
+  write.csv(distToClosestBCBC, dir, row.names = FALSE)
+  
+  
+  
+  # Finds the average distance of the closest A from each D ****************************************************************************
+  
+  distToClosestAD = foreach(i = 1:numsD, .combine = "c") %dopar% {
+    minDist = sqrt(maxXum^2 + maxYum^2)
+    x = D[[i, "CellNumber"]]
+    if (newCombo[[x, "xDim"]] <= (maxXum - maxDist) && newCombo[[x, "xDim"]] >= maxDist && newCombo[[x, "yDim"]] <= (maxYum - maxDist) && newCombo[[x, "yDim"]] >= maxDist) {
+      for (j in 1:nums) {
+        if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
+          if ((newCombo[[j, "identityCat"]] == "A") && (x != j)) {
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
+            }
+          }
+        }
+      }
+    }
+    else {
+      minDist = NA
+    }
+    minDist
+  }
+  
+  dir = paste0(outputFolder, "/distAD", as.character(imageNumber), ".csv")
+  write.csv(distToClosestAD, dir, row.names = FALSE)
+  
+  
+  # Finds the average distance of the closest D from each D ****************************************************************************
+  
+  distToClosestDD = foreach(i = 1:numsD, .combine = "c") %dopar% {
+    minDist = sqrt(maxXum^2 + maxYum^2)
+    x = D[[i, "CellNumber"]]
+    if (newCombo[[x, "xDim"]] <= (maxXum - maxDist) && newCombo[[x, "xDim"]] >= maxDist && newCombo[[x, "yDim"]] <= (maxYum - maxDist) && newCombo[[x, "yDim"]] >= maxDist) {
+      for (j in 1:nums) {
+        if ((!is.na(newCombo[[j, "identityCat"]])) && !is.na(distances[[x, j]])) {
+          if ((newCombo[[j, "identityCat"]] == "D") && (x != j)) {
+            if (distances[x, j] < minDist) {
+              minDist = distances[x, j]
+            }
+          }
+        }
+      }
+    }
+    else {
+      minDist = NA
+    }
+    minDist
+  }
+  
+  dir = paste0(outputFolder, "/distDD", as.character(imageNumber), ".csv")
+  write.csv(distToClosestDD, dir, row.names = FALSE)
+  
 ```
 

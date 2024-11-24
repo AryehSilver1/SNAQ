@@ -36,9 +36,9 @@ markerB = "CD68"
 markerC = "PD-L1"
 markerD = "Neither"
 
-workingDir = "C:/Users/arisi/Dropbox (UFL)/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/PDAC Images/Output" #folder with output of Data Analysis
+workingDir = "C:/Users/arisi/UFL Dropbox/Aryeh Silver/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/1.CSBJ/Revisions (Submission 2)/code/Code_final_for_Ari/Output" #folder with output of Data Analysis
 
-graphOutputPath = "C:/Users/arisi/UFL Dropbox/Aryeh Silver/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/Figures/PDAC Graphs" #folder where you want to save the graphs
+graphOutputPath = "C:/Users/arisi/UFL Dropbox/Aryeh Silver/2.ImmunoTherapy/IHC ICC/KR/KR128 Neighborhood Methods Paper/Methods Paper/1.CSBJ/Revisions (Submission 2)/code/Code_final_for_Ari/Graphs" #folder where you want to save the graphs
 
 #workingDir = "" #Path to the folder with output CSV files (make sure to use backwards slashes)
 #graphOutputPath = "" #Path to the folder where you want to save the graphs
@@ -1110,3 +1110,293 @@ ggsave(graphTitle, plotCTRClosestCell, width = 6, height = 4, units = "in", dpi 
 ```
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r, include = FALSE}
+setwd(workingDir)
+
+closestAA = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("distAA", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  closestAA = rbind(closestAA, temp)
+}
+
+colnames(closestAA) = c("dist")
+closestAA$category = "distToAA"
+
+
+
+closestDA = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("distDA", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  closestDA = rbind(closestDA, temp)
+}
+
+colnames(closestDA) = c("dist")
+closestDA$category = "distToDA"
+
+
+closestCombo = rbind(closestAA, closestDA)
+```
+
+Finds the average distance of the closest A or D from each A
+```{r}
+
+medians = aggregate(dist ~ category, data = closestCombo, FUN = median)
+
+plotClosest = ggplot(data = closestCombo, aes(x = category, y = dist, fill = category)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(values=c("brown1", "azure4")) +
+  coord_cartesian(ylim = c(0, 70)) +
+  geom_signif(comparisons = list(c("distToD", "distToA")),
+              map_signif_level = TRUE, 
+              textsize = 4,
+              y_position = 60) +
+  scale_x_discrete(limits = c("distToAA", "distToDA"), labels = c("distToAA" = paste0("distance from ", markerA, " to ", markerA), "distToDA" = paste0("distance from ", markerA, " to ", markerD))) +
+  labs(title = paste0("Closest ", markerA, " or ", markerD, " from each ", markerA),
+       x = "",
+       y = "Distance (µm)") +
+  geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5) +
+  theme(legend.position = "none")
+plotClosest
+
+
+#to get summary data by group
+#tapply(dataToSummarize, summarizeByThis, summary)
+tapply(closestCombo$dist, closestCombo$category, summary)
+
+graphTitle = paste0(graphOutputPath, "/", "closest ", markerA, " or ", markerD, " from ", markerA, ".png")
+ggsave(graphTitle, plotClosest, width = 6, height = 4, units = "in", dpi = 600)
+
+```
+
+
+
+
+```{r, include = FALSE}
+setwd(workingDir)
+
+closestBB = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("distBB", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  closestBB = rbind(closestBB, temp)
+}
+
+colnames(closestBB) = c("dist")
+closestBB$category = "distToBB"
+
+
+
+closestBCB = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("distBCB", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  closestBCB = rbind(closestBCB, temp)
+}
+
+colnames(closestBCB) = c("dist")
+closestBCB$category = "distToBCB"
+
+
+closestCombo = rbind(closestBB, closestBCB)
+```
+
+Finds the average distance of the closest B or B.C from each B
+```{r}
+
+medians = aggregate(dist ~ category, data = closestCombo, FUN = median)
+
+plotClosest = ggplot(data = closestCombo, aes(x = category, y = dist, fill = category)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(values=c("brown1", "azure4")) +
+  coord_cartesian(ylim = c(0, 70)) +
+  geom_signif(comparisons = list(c("distToBB", "distToBCB")),
+              map_signif_level = TRUE, 
+              textsize = 4,
+              y_position = 60) +
+  scale_x_discrete(limits = c("distToBB", "distToBCB"), labels = c("distToBB" = paste0("distance from ", markerB, " to ", markerB), "distToBCB" = paste0("distance from ", markerB, " to ", markerC, "+ ", markerB))) +
+  labs(title = paste0("Closest ", markerB, " or ", markerC, "+ ", markerB, " from each ", markerB),
+       x = "",
+       y = "Distance (µm)") +
+  geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5) +
+  theme(legend.position = "none")
+plotClosest
+
+
+#to get summary data by group
+#tapply(dataToSummarize, summarizeByThis, summary)
+tapply(closestCombo$dist, closestCombo$category, summary)
+
+graphTitle = paste0(graphOutputPath, "/", "closest ", markerB, " or ", markerC, "+ ", markerB, " from ", markerB, ".png")
+ggsave(graphTitle, plotClosest, width = 6, height = 4, units = "in", dpi = 600)
+
+```
+
+
+```{r, include = FALSE}
+setwd(workingDir)
+
+closestBBC = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("distBBC", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  closestBBC = rbind(closestBBC, temp)
+}
+
+colnames(closestBBC) = c("dist")
+closestBBC$category = "distToBBC"
+
+
+
+closestBCBC = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("distBCBC", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  closestBCBC = rbind(closestBCBC, temp)
+}
+
+colnames(closestBCBC) = c("dist")
+closestBCBC$category = "distToBCBC"
+
+
+closestCombo = rbind(closestBBC, closestBCBC)
+```
+
+Finds the average distance of the closest B or B.C from each B.C
+```{r}
+
+medians = aggregate(dist ~ category, data = closestCombo, FUN = median)
+
+plotClosest = ggplot(data = closestCombo, aes(x = category, y = dist, fill = category)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(values=c("brown1", "azure4")) +
+  coord_cartesian(ylim = c(0, 70)) +
+  geom_signif(comparisons = list(c("distToBBC", "distToBCBC")),
+              map_signif_level = TRUE, 
+              textsize = 4,
+              y_position = 60) +
+  scale_x_discrete(limits = c("distToBBC", "distToBCBC"), labels = c("distToBBC" = paste0("distance from ", markerC, "+ ", markerB, " to ", markerB), "distToBCBC" = paste0("distance from ", markerC, "+ ", markerB, " to ", markerC, "+ ", markerB))) +
+  labs(title = paste0("Closest ", markerB, " or ", markerC, "+ ", markerB, " from each ", markerC, "+ ", markerB),
+       x = "",
+       y = "Distance (µm)") +
+  geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5) +
+  theme(legend.position = "none")
+plotClosest
+
+
+#to get summary data by group
+#tapply(dataToSummarize, summarizeByThis, summary)
+tapply(closestCombo$dist, closestCombo$category, summary)
+
+graphTitle = paste0(graphOutputPath, "/", "closest ", markerB, " or ", markerC, "+ ", markerB, " from ", markerC, "+ ", markerB, ".png")
+ggsave(graphTitle, plotClosest, width = 6, height = 4, units = "in", dpi = 600)
+
+```
+
+
+
+
+
+```{r, include = FALSE}
+setwd(workingDir)
+
+closestAD = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("distAD", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  closestAD = rbind(closestAD, temp)
+}
+
+colnames(closestAD) = c("dist")
+closestAD$category = "distToAD"
+
+
+
+closestDD = data.frame()
+
+for (n in 1:numberOfImages) {
+  fileName = paste0("distDD", as.character(n), ".csv")
+  temp = read_csv(fileName)
+  closestDD = rbind(closestDD, temp)
+}
+
+colnames(closestDD) = c("dist")
+closestDD$category = "distToDD"
+
+
+closestCombo = rbind(closestAD, closestDD)
+```
+
+Finds the average distance of the closest A or D from each D
+```{r}
+
+medians = aggregate(dist ~ category, data = closestCombo, FUN = median)
+
+plotClosest = ggplot(data = closestCombo, aes(x = category, y = dist, fill = category)) +
+  geom_boxplot(outlier.shape = NA, color = "black") +
+  scale_fill_manual(values=c("brown1", "azure4")) +
+  coord_cartesian(ylim = c(0, 70)) +
+  geom_signif(comparisons = list(c("distToAD", "distToDD")),
+              map_signif_level = TRUE, 
+              textsize = 4,
+              y_position = 60) +
+  scale_x_discrete(limits = c("distToAD", "distToDD"), labels = c("distToAD" = paste0("distance from ", markerD, " to ", markerA), "distToDD" = paste0("distance from ", markerD, " to ", markerD))) +
+  labs(title = paste0("Closest ", markerA, " or ", markerD, " from each ", markerD),
+       x = "",
+       y = "Distance (µm)") +
+  geom_text(data = medians, aes(label = round(dist, 2)), vjust = -0.5) +
+  theme(legend.position = "none")
+plotClosest
+
+
+#to get summary data by group
+#tapply(dataToSummarize, summarizeByThis, summary)
+tapply(closestCombo$dist, closestCombo$category, summary)
+
+graphTitle = paste0(graphOutputPath, "/", "closest ", markerA, " or ", markerD, " from ", markerD, ".png")
+ggsave(graphTitle, plotClosest, width = 6, height = 4, units = "in", dpi = 600)
+
+```
